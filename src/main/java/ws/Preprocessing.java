@@ -19,7 +19,6 @@ public class Preprocessing {
         settings.setHeaderExtractionEnabled(false);
         settings.setHeaders("year", "keyword1", "keyword2", "authors");
         TsvParser parser = new TsvParser(settings);
-//        parser.getRecordMetadata().setTypeOfColumns(String.class, "year", "keyword1", "keyword2", "authors");
 
         InputStream ds1 = Preprocessing.class.getResourceAsStream("dataset/ds-1.tsv");
         IterableResult<Record, ParsingContext> iter = parser.iterateRecords(ds1);
