@@ -121,9 +121,9 @@ public class GraphUtils {
     public static void writeImage(File dot, String name) {
         try {
             MutableGraph g = Parser.read(dot);
-            File imgFile = getNewFile("plots", name, "png");
+            File imgFile = getNewFile("plots", name, "svg");
             Utils.print(imgFile.getParentFile().exists());
-            Graphviz.fromGraph(g).width(700).render(Format.PNG).toFile(imgFile);
+            Graphviz.fromGraph(g).width(700).render(Format.SVG).toFile(imgFile);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -142,5 +142,4 @@ public class GraphUtils {
         System.out.println(path);
         return new File(path);
     }
-
 }

@@ -6,19 +6,20 @@ import org.jgrapht.util.SupplierUtil;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class MyVertex {
-    private String id;
-    private String value;
-    private static Supplier<Long> idSupplier = SupplierUtil.createLongSupplier(1);
+    private final String id;
+    private final String value;
+    private final static Supplier<Long> idSupplier = SupplierUtil.createLongSupplier(1);
 
     public MyVertex(String value) {
         this.value = value;
         this.id = idSupplier.get().toString();
     }
 
-    public MyVertex(String id, String value) {
+    MyVertex(String id, String value) {
         this.id = id;
         this.value = value;
     }
@@ -40,5 +41,18 @@ public class MyVertex {
     @Override
     public String toString() {
         return id + ": " + value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MyVertex myVertex = (MyVertex) o;
+        return value.equals(myVertex.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }

@@ -27,7 +27,7 @@ public class MyEdge extends DefaultEdge {
     public Map<String, Attribute> getAttributes() {
         Map<String, Attribute> attributes = new HashMap<>();
         for (Map.Entry<String, Integer> entry : authors.entrySet()) {
-            attributes.put(entry.getKey(), DefaultAttribute.createAttribute(entry.getValue()));
+            attributes.put("a_" + entry.getKey(), DefaultAttribute.createAttribute(entry.getValue()));
         }
         return attributes;
     }
@@ -35,7 +35,7 @@ public class MyEdge extends DefaultEdge {
     public static Map<String, Integer> getAuthorsFromAttributes(Map<String, Attribute> attributes) {
         Map<String, Integer> authors = new HashMap<>();
         for (Map.Entry<String, Attribute> entry : attributes.entrySet()) {
-            authors.put(entry.getKey(), Integer.valueOf(entry.getValue().getValue()));
+            authors.put(entry.getKey().substring(2), Integer.valueOf(entry.getValue().getValue()));
         }
         return authors;
     }
