@@ -107,7 +107,7 @@ public class Preprocessing {
 
     public static void writeGraphsFromDS2(Map<String, Graph<MyVertex, MyEdgeDS2>> graphs)
             throws IOException, ExportException, URISyntaxException, TransformerException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, Graph<MyVertex, MyEdgeDS2>> entry : graphs.entrySet()) {
             String filename = entry.getKey();
             Graph<MyVertex, MyEdgeDS2> graph = entry.getValue();
@@ -129,11 +129,6 @@ public class Preprocessing {
                 GraphUtils.writeImage(graph,"plots/ds2", filename);
             }
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd__HH_mm_ss");
-        String now = LocalDateTime.now().format(formatter);
-        File f = GraphUtils.getNewFile(".", "log__" + now, "txt");
-        try (FileWriter writer = new FileWriter(f)) {
-            writer.write(sb.toString());
-        }
+        writeLog(sb, "writeDS2_log");
     }
 }

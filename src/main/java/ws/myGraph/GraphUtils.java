@@ -14,17 +14,12 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.io.*;
 import org.w3c.dom.Document;
-import ws.Main;
 import ws.Utils;
 
-import javax.imageio.ImageIO;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,7 +30,7 @@ public class GraphUtils {
     public static Graph<MyVertex, MyEdgeDS1> loadDS1Graph(String name)
             throws IOException, ImportException, URISyntaxException {
         Graph<MyVertex, MyEdgeDS1> graph = new SimpleGraph<>(MyEdgeDS1.class);
-        Path path = getNewFile("graphs/ds1", name, "dot").toPath();
+        Path path = Utils.getNewFile("graphs/ds1", name, "dot").toPath();
         Reader reader = Files.newBufferedReader(path);
 
         VertexProvider<MyVertex> vertexProvider = (id, attributes) -> new MyVertex(id, attributes.get("value").getValue());
@@ -56,7 +51,7 @@ public class GraphUtils {
 
         GraphExporter<MyVertex, MyEdgeDS1> exporter = new DOTExporter<>(vertexIDProvider, vertexLabelProvider,
                 null, vertexAttributeProvider, edgeAttributeProvider);
-        File file = getNewFile("graphs/ds1", name, "dot");
+        File file = Utils.getNewFile("graphs/ds1", name, "dot");
         Writer writer = new FileWriter(file);
         exporter.exportGraph(graph, writer);
         return file;
@@ -65,7 +60,7 @@ public class GraphUtils {
     public static Graph<MyVertex, MyEdgeDS2> loadDS2Graph(String name)
             throws IOException, ImportException, URISyntaxException {
         Graph<MyVertex, MyEdgeDS2> graph = new SimpleGraph<>(MyEdgeDS2.class);
-        Path path = getNewFile("graphs/ds2", name, "dot").toPath();
+        Path path = Utils.getNewFile("graphs/ds2", name, "dot").toPath();
         Reader reader = Files.newBufferedReader(path);
 
         VertexProvider<MyVertex> vertexProvider = (id, attributes) -> new MyVertex(id, attributes.get("value").getValue());
@@ -87,7 +82,7 @@ public class GraphUtils {
 
         GraphExporter<MyVertex, MyEdgeDS2> exporter = new DOTExporter<>(vertexIDProvider, vertexLabelProvider,
                 edgeLabelProvider, vertexAttributeProvider, edgeAttributeProvider);
-        File file = getNewFile("graphs/ds2", name, "dot");
+        File file = Utils.getNewFile("graphs/ds2", name, "dot");
         Writer writer = new FileWriter(file);
         exporter.exportGraph(graph, writer);
         return file;
@@ -95,7 +90,7 @@ public class GraphUtils {
 
     public static void writeImage(File dot, String path, String name) throws IOException, URISyntaxException {
         MutableGraph g = Parser.read(dot);
-        File imgFile = getNewFile(path, name, "svg");
+        File imgFile = Utils.getNewFile(path, name, "svg");
         Utils.print(imgFile.getParentFile().exists());
         Graphviz.fromGraph(g).width(700).render(Format.SVG).toFile(imgFile);
     }
@@ -108,19 +103,11 @@ public class GraphUtils {
         layout.execute(graphAdapter.getDefaultParent());
 
         Document svgDoc = mxCellRenderer.createSvgDocument(graphAdapter, null, 2, null, null);
-        File svgFile = GraphUtils.getNewFile(path, name, "svg");
+        File svgFile = Utils.getNewFile(path, name, "svg");
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         Result output = new StreamResult(svgFile);
         Source input = new DOMSource(svgDoc);
         transformer.transform(input, output);
     }
 
-    public static File getNewFile(String pathName, String fileName, String ext) throws URISyntaxException{
-        URI res = Main.class.getResource(pathName).toURI();
-        System.out.println(fileName + " " + new File(res).exists());
-
-        String path = res.getPath() + "/" + fileName + "." + ext;
-        System.out.println(path);
-        return new File(path);
-    }
 }

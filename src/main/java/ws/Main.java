@@ -17,12 +17,10 @@ import java.util.Map;
 public class Main {
     public static void main(String... args) throws ExportException, IOException, URISyntaxException, TransformerException {
         // preprocess DS1
-        /*
         IterableResult<Record, ParsingContext> iter1 = Preprocessing.readDS(
                 new String[]{"year", "keyword1", "keyword2", "authors"},"dataset/ds-1.tsv");
         Map<String, Graph<MyVertex, MyEdgeDS1>> graphs1 = Preprocessing.createGraphsFromDS1(iter1);
         Preprocessing.writeGraphsFromDS1(graphs1);
-        */
 
         // preprocess DS2
         IterableResult<Record, ParsingContext> iter2 = Preprocessing.readDS(
