@@ -2,7 +2,7 @@
 /src/main/resources/ws/dataset/ds-1.tsv
 /src/main/resources/ws/dataset/ds-2.tsv
 /target/*
-/src/main/java/ws/Prova.java
 /src/main/java/ws/HelloJGraphT.java
 /ws_project.iml
 /.idea/
+/src/test/ws/Prova

@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class MyEdge extends DefaultEdge {
-    private Map<String, Integer> authors;
+public class MyEdgeDS1 extends DefaultEdge {
+    private final Map<String, Integer> authors;
 
-    public MyEdge(Map<String, Integer> authors) {
+    public MyEdgeDS1(Map<String, Integer> authors) {
         this.authors = authors;
     }
 

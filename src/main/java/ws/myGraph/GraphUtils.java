@@ -1,141 +1,122 @@
 package ws.myGraph;
 
+import com.mxgraph.layout.mxCircleLayout;
+import com.mxgraph.layout.mxIGraphLayout;
+import com.mxgraph.util.mxCellRenderer;
+import com.mxgraph.util.mxConstants;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.parse.Parser;
 import org.jgrapht.Graph;
+import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.io.*;
+import org.w3c.dom.Document;
 import ws.Main;
 import ws.Utils;
 
+import javax.imageio.ImageIO;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 
 public class GraphUtils {
 
-    // TODO remove this method (?)
-    public static void demo() throws ExportException, IOException, ImportException {
-        // create default graph
-        Graph<MyVertex, MyEdge> myGraph = createMyGraphDefault();
-        Utils.print("-- toString output");
-        String myGraphTxt = myGraph.toString();
-        Utils.print(myGraphTxt);
-        Utils.print("");
-
-        // store dot and plot of the graph
-        File myFile = saveMyGraph(myGraph, "MyGraph0");
-        writeImage(myFile, "MyGraph0");
-        Utils.print("");
-
-        // load the graph and check if the loaded graph is equal to the original one
-        Graph<MyVertex, MyEdge> myGraph1 = loadMyGraph("MyGraph0");
-        String myGraphTxt1 = myGraph1.toString();
-        Utils.print(myGraphTxt1);
-        Utils.print("two graphs are equal: " + myGraphTxt.equals(myGraphTxt1));
-        File myFile1 = saveMyGraph(myGraph1, "MyGraph1");
-        GraphUtils.writeImage(myFile1, "MyGraph1");
-    }
-
-    // TODO remove this method (?)
-    public static Graph<MyVertex, MyEdge> createMyGraphDefault() {
-        Graph<MyVertex, MyEdge> myGraph = new SimpleGraph<>(MyEdge.class);
-
-        MyVertex v1 = new MyVertex("v1");
-        Utils.print(v1);
-        MyVertex v2 = new MyVertex("v2");
-        MyVertex v3 = new MyVertex("v3");
-        MyVertex v4 = new MyVertex("v4");
-
-        // add the vertices
-        myGraph.addVertex(v1);
-        myGraph.addVertex(v2);
-        myGraph.addVertex(v3);
-        myGraph.addVertex(v4);
-
-        // add edges to create a circuit
-        Map<String, Integer> authors1 = new HashMap<>();
-        authors1.put("Mario", 1);
-        authors1.put("Gino", 2);
-        authors1.put("Ugo", 3);
-        myGraph.addEdge(v1, v2, new MyEdge(authors1));
-
-        Map<String, Integer> authors2 = new HashMap<>();
-        authors2.put("Mario", 4);
-        authors2.put("Gino", 3);
-        authors2.put("Ugo", 1);
-        myGraph.addEdge(v2, v3, new MyEdge(authors2));
-
-        Map<String, Integer> authors3 = new HashMap<>();
-        authors3.put("Mario", 2);
-        authors3.put("Gino", 1);
-        authors3.put("Ugo", 6);
-        myGraph.addEdge(v3, v4, new MyEdge(authors3));
-
-        Map<String, Integer> authors4 = new HashMap<>();
-        authors4.put("Mario", 7);
-        authors4.put("Gino", 7);
-        authors4.put("Ugo", 7);
-        myGraph.addEdge(v4, v1, new MyEdge(authors4));
-
-        return myGraph;
-    }
-
-    public static Graph<MyVertex, MyEdge> loadMyGraph(String name) throws IOException, ImportException {
-        Graph<MyVertex, MyEdge> myGraph = new SimpleGraph<>(MyEdge.class);
-        Path path = getNewFile("graphs", name, "dot").toPath();   // TODO change txt --> dot
+    public static Graph<MyVertex, MyEdgeDS1> loadDS1Graph(String name)
+            throws IOException, ImportException, URISyntaxException {
+        Graph<MyVertex, MyEdgeDS1> graph = new SimpleGraph<>(MyEdgeDS1.class);
+        Path path = getNewFile("graphs/ds1", name, "dot").toPath();
         Reader reader = Files.newBufferedReader(path);
 
         VertexProvider<MyVertex> vertexProvider = (id, attributes) -> new MyVertex(id, attributes.get("value").getValue());
-        EdgeProvider<MyVertex, MyEdge> edgeProvider = (from, to, label, attributes) -> new MyEdge(MyEdge.getAuthorsFromAttributes(attributes));
+        EdgeProvider<MyVertex, MyEdgeDS1> edgeProvider = (from, to, label, attributes) -> new MyEdgeDS1(MyEdgeDS1.getAuthorsFromAttributes(attributes));
 
-        GraphImporter<MyVertex, MyEdge> importer = new DOTImporter<>(vertexProvider, edgeProvider);
-        importer.importGraph(myGraph, reader);
+        GraphImporter<MyVertex, MyEdgeDS1> importer = new DOTImporter<>(vertexProvider, edgeProvider);
+        importer.importGraph(graph, reader);
 
-        return myGraph;
+        return graph;
     }
 
-    public static File saveMyGraph(Graph<MyVertex, MyEdge> myGraph, String name) throws ExportException, IOException {
+    public static File saveDS1Graph(Graph<MyVertex, MyEdgeDS1> graph, String name)
+            throws ExportException, IOException, URISyntaxException {
         ComponentNameProvider<MyVertex> vertexIDProvider = MyVertex::getId;
         ComponentNameProvider<MyVertex> vertexLabelProvider = MyVertex::getId;
-        ComponentNameProvider<MyEdge> edgeLabelProvider = DefaultEdge::toString;
         ComponentAttributeProvider<MyVertex> vertexAttributeProvider = MyVertex::getAttribute;
-        ComponentAttributeProvider<MyEdge> edgeAttributeProvider = MyEdge::getAttributes;
+        ComponentAttributeProvider<MyEdgeDS1> edgeAttributeProvider = MyEdgeDS1::getAttributes;
 
-        GraphExporter<MyVertex, MyEdge> exporter = new DOTExporter<>(vertexIDProvider, vertexLabelProvider,
+        GraphExporter<MyVertex, MyEdgeDS1> exporter = new DOTExporter<>(vertexIDProvider, vertexLabelProvider,
                 null, vertexAttributeProvider, edgeAttributeProvider);
-        File file = getNewFile("graphs", name, "dot");
+        File file = getNewFile("graphs/ds1", name, "dot");
         Writer writer = new FileWriter(file);
-        exporter.exportGraph(myGraph, writer);
+        exporter.exportGraph(graph, writer);
         return file;
     }
 
-    public static void writeImage(File dot, String name) {
-        try {
-            MutableGraph g = Parser.read(dot);
-            File imgFile = getNewFile("plots", name, "svg");
-            Utils.print(imgFile.getParentFile().exists());
-            Graphviz.fromGraph(g).width(700).render(Format.SVG).toFile(imgFile);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+    public static Graph<MyVertex, MyEdgeDS2> loadDS2Graph(String name)
+            throws IOException, ImportException, URISyntaxException {
+        Graph<MyVertex, MyEdgeDS2> graph = new SimpleGraph<>(MyEdgeDS2.class);
+        Path path = getNewFile("graphs/ds2", name, "dot").toPath();
+        Reader reader = Files.newBufferedReader(path);
+
+        VertexProvider<MyVertex> vertexProvider = (id, attributes) -> new MyVertex(id, attributes.get("value").getValue());
+        EdgeProvider<MyVertex, MyEdgeDS2> edgeProvider = (from, to, label, attributes) -> new MyEdgeDS2(MyEdgeDS2.getCollaborationsFromAttributes(attributes));
+
+        GraphImporter<MyVertex, MyEdgeDS2> importer = new DOTImporter<>(vertexProvider, edgeProvider);
+        importer.importGraph(graph, reader);
+
+        return graph;
     }
 
-    public static File getNewFile(String pathName, String fileName, String ext) {
-        URI res = null;
-        try {
-            res = Main.class.getResource(pathName).toURI();
-        } catch (URISyntaxException ex) {
-            ex.printStackTrace();
-        }
+    public static File saveDS2Graph(Graph<MyVertex, MyEdgeDS2> graph, String name)
+            throws ExportException, IOException, URISyntaxException {
+        ComponentNameProvider<MyVertex> vertexIDProvider = MyVertex::getId;
+        ComponentNameProvider<MyVertex> vertexLabelProvider = MyVertex::getId;
+        ComponentNameProvider<MyEdgeDS2> edgeLabelProvider = component -> String.valueOf(component.getCollaborations());
+        ComponentAttributeProvider<MyVertex> vertexAttributeProvider = MyVertex::getAttribute;
+        ComponentAttributeProvider<MyEdgeDS2> edgeAttributeProvider = MyEdgeDS2::getAttributes;
+
+        GraphExporter<MyVertex, MyEdgeDS2> exporter = new DOTExporter<>(vertexIDProvider, vertexLabelProvider,
+                edgeLabelProvider, vertexAttributeProvider, edgeAttributeProvider);
+        File file = getNewFile("graphs/ds2", name, "dot");
+        Writer writer = new FileWriter(file);
+        exporter.exportGraph(graph, writer);
+        return file;
+    }
+
+    public static void writeImage(File dot, String path, String name) throws IOException, URISyntaxException {
+        MutableGraph g = Parser.read(dot);
+        File imgFile = getNewFile(path, name, "svg");
+        Utils.print(imgFile.getParentFile().exists());
+        Graphviz.fromGraph(g).width(700).render(Format.SVG).toFile(imgFile);
+    }
+
+    public static void writeImage(Graph g, String path, String name) throws URISyntaxException, TransformerException {
+        JGraphXAdapter<Object, DefaultEdge> graphAdapter = new JGraphXAdapter<Object, DefaultEdge>(g);
+        graphAdapter.selectEdges();
+        System.out.println(Arrays.toString(graphAdapter.setCellStyles(mxConstants.STYLE_NOLABEL, "1")));
+        mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
+        layout.execute(graphAdapter.getDefaultParent());
+
+        Document svgDoc = mxCellRenderer.createSvgDocument(graphAdapter, null, 2, null, null);
+        File svgFile = GraphUtils.getNewFile(path, name, "svg");
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        Result output = new StreamResult(svgFile);
+        Source input = new DOMSource(svgDoc);
+        transformer.transform(input, output);
+    }
+
+    public static File getNewFile(String pathName, String fileName, String ext) throws URISyntaxException{
+        URI res = Main.class.getResource(pathName).toURI();
         System.out.println(fileName + " " + new File(res).exists());
 
         String path = res.getPath() + "/" + fileName + "." + ext;
