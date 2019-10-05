@@ -4,6 +4,7 @@ import com.mxgraph.layout.mxCircleLayout;
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.util.mxConstants;
+import com.mxgraph.util.mxRectangle;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
@@ -11,7 +12,9 @@ import guru.nidi.graphviz.parse.Parser;
 import org.jgrapht.Graph;
 import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.io.*;
 import org.w3c.dom.Document;
 import ws.Utils;
@@ -24,6 +27,8 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GraphUtils {
 
@@ -57,30 +62,37 @@ public class GraphUtils {
         return file;
     }
 
-    public static Graph<MyVertex, MyEdgeDS2> loadDS2Graph(String name)
+    public static Graph<MyVertex, DefaultWeightedEdge> loadDS2Graph(String name)
             throws IOException, ImportException, URISyntaxException {
-        Graph<MyVertex, MyEdgeDS2> graph = new SimpleGraph<>(MyEdgeDS2.class);
+        SimpleWeightedGraph<MyVertex, DefaultWeightedEdge> graph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
         Path path = Utils.getNewFile("graphs/ds2", name, "dot").toPath();
         Reader reader = Files.newBufferedReader(path);
 
         VertexProvider<MyVertex> vertexProvider = (id, attributes) -> new MyVertex(id, attributes.get("value").getValue());
-        EdgeProvider<MyVertex, MyEdgeDS2> edgeProvider = (from, to, label, attributes) -> new MyEdgeDS2(MyEdgeDS2.getCollaborationsFromAttributes(attributes));
-
-        GraphImporter<MyVertex, MyEdgeDS2> importer = new DOTImporter<>(vertexProvider, edgeProvider);
+        EdgeProvider<MyVertex, DefaultWeightedEdge> edgeProvider = (from, to, label, attributes) -> {
+            DefaultWeightedEdge e = new DefaultWeightedEdge();
+            graph.addEdge(from, to, e);
+            graph.setEdgeWeight(e, Double.parseDouble(attributes.get("weight").getValue()));
+            return e;
+        };
+        GraphImporter<MyVertex, DefaultWeightedEdge> importer = new DOTImporter<>(vertexProvider, edgeProvider);
         importer.importGraph(graph, reader);
 
         return graph;
     }
 
-    public static File saveDS2Graph(Graph<MyVertex, MyEdgeDS2> graph, String name)
+    public static File saveDS2Graph(Graph<MyVertex, DefaultWeightedEdge> graph, String name)
             throws ExportException, IOException, URISyntaxException {
         ComponentNameProvider<MyVertex> vertexIDProvider = MyVertex::getId;
         ComponentNameProvider<MyVertex> vertexLabelProvider = MyVertex::getId;
-        ComponentNameProvider<MyEdgeDS2> edgeLabelProvider = component -> String.valueOf(component.getCollaborations());
+        ComponentNameProvider<DefaultWeightedEdge> edgeLabelProvider = component -> String.valueOf(graph.getEdgeWeight(component));
         ComponentAttributeProvider<MyVertex> vertexAttributeProvider = MyVertex::getAttribute;
-        ComponentAttributeProvider<MyEdgeDS2> edgeAttributeProvider = MyEdgeDS2::getAttributes;
-
-        GraphExporter<MyVertex, MyEdgeDS2> exporter = new DOTExporter<>(vertexIDProvider, vertexLabelProvider,
+        ComponentAttributeProvider<DefaultWeightedEdge> edgeAttributeProvider = component -> {
+            Map<String, Attribute> attributes = new HashMap<>();
+            attributes.put("weight", DefaultAttribute.createAttribute(graph.getEdgeWeight(component)));
+            return attributes;
+        };
+        GraphExporter<MyVertex, DefaultWeightedEdge> exporter = new DOTExporter<>(vertexIDProvider, vertexLabelProvider,
                 edgeLabelProvider, vertexAttributeProvider, edgeAttributeProvider);
         File file = Utils.getNewFile("graphs/ds2", name, "dot");
         Writer writer = new FileWriter(file);
@@ -102,7 +114,7 @@ public class GraphUtils {
         mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
         layout.execute(graphAdapter.getDefaultParent());
 
-        Document svgDoc = mxCellRenderer.createSvgDocument(graphAdapter, null, 2, null, null);
+        Document svgDoc = mxCellRenderer.createSvgDocument(graphAdapter, null, 0.1, null, null);
         File svgFile = Utils.getNewFile(path, name, "svg");
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         Result output = new StreamResult(svgFile);

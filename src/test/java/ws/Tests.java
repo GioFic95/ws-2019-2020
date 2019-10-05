@@ -1,11 +1,12 @@
 package ws;
 
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.io.ExportException;
 import org.jgrapht.io.ImportException;
 import ws.myGraph.MyEdgeDS1;
-import ws.myGraph.MyEdgeDS2;
 import ws.myGraph.MyVertex;
 
 import java.io.File;
@@ -44,9 +45,10 @@ public class Tests {
         Graph<MyVertex, MyEdgeDS1> graph1 = loadDS1Graph("MyGraphDS1_0");
         String graphTxt1 = graph1.toString();
         Utils.print(graphTxt1);
-        Utils.print("two graphs are equal: " + graphTxt.equals(graphTxt1));
         File myFile1 = saveDS1Graph(graph1, "MyGraphDS1_1");
         writeImage(myFile1, "plots/ds1", "MyGraphDS1_1");
+
+        Utils.print("two graphs are equal: " + graph.equals(graph1));
     }
 
     @org.jetbrains.annotations.NotNull
@@ -95,7 +97,7 @@ public class Tests {
 
     public static void demoDS2() throws ExportException, IOException, ImportException, URISyntaxException {
         // create default graph
-        Graph<MyVertex, MyEdgeDS2> graph = createMyGraphDS2Default();
+        Graph<MyVertex, DefaultWeightedEdge> graph = createMyGraphDS2Default();
         Utils.print("-- toString output");
         String graphTxt = graph.toString();
         Utils.print(graphTxt);
@@ -107,7 +109,7 @@ public class Tests {
         Utils.print("");
 
         // load the graph and check if the loaded graph is equal to the original one
-        Graph<MyVertex, MyEdgeDS2> graph1 = loadDS2Graph("MyGraphDS2_0");
+        Graph<MyVertex, DefaultWeightedEdge> graph1 = loadDS2Graph("MyGraphDS2_0");
         String graphTxt1 = graph1.toString();
         Utils.print(graphTxt1);
         Utils.print("two graphs are equal: " + graphTxt.equals(graphTxt1));
@@ -116,8 +118,8 @@ public class Tests {
     }
 
     @org.jetbrains.annotations.NotNull
-    public static Graph<MyVertex, MyEdgeDS2> createMyGraphDS2Default() {
-        Graph<MyVertex, MyEdgeDS2> graph = new SimpleGraph<>(MyEdgeDS2.class);
+    public static Graph<MyVertex, DefaultWeightedEdge> createMyGraphDS2Default() {
+        Graph<MyVertex, DefaultWeightedEdge> graph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
 
         MyVertex v1 = new MyVertex("v1");
         MyVertex v2 = new MyVertex("v2");
@@ -131,11 +133,15 @@ public class Tests {
         graph.addVertex(v4);
 
         // add edges to create a circuit
-        graph.addEdge(v1, v2, new MyEdgeDS2(2));
-        graph.addEdge(v2, v3, new MyEdgeDS2(1));
-        graph.addEdge(v3, v4, new MyEdgeDS2(3));
+        DefaultWeightedEdge e1 = graph.addEdge(v1, v2);
+        graph.setEdgeWeight(e1, 2);
+        DefaultWeightedEdge e2 = graph.addEdge(v2, v3);
+        graph.setEdgeWeight(e2, 1);
+        DefaultWeightedEdge e3 = graph.addEdge(v3, v4);
+        graph.setEdgeWeight(e3, 2);
         graph.addVertex(new MyVertex("v1"));
-        graph.addEdge(v4, v1, new MyEdgeDS2(2));
+        DefaultWeightedEdge e4 = graph.addEdge(v4, v1);
+        graph.setEdgeWeight(e4, 3);
 
         return graph;
     }

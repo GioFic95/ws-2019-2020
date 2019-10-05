@@ -7,22 +7,21 @@ import com.univocity.parsers.tsv.TsvParser;
 import com.univocity.parsers.tsv.TsvParserSettings;
 import guru.nidi.graphviz.engine.GraphvizException;
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleGraph;
+import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.io.ExportException;
 import org.json.JSONObject;
 import ws.myGraph.GraphUtils;
 import ws.myGraph.MyEdgeDS1;
-import ws.myGraph.MyEdgeDS2;
 import ws.myGraph.MyVertex;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,22 +81,28 @@ public class Preprocessing {
         }
     }
 
-    public static Map<String, Graph<MyVertex, MyEdgeDS2>> createGraphsFromDS2(IterableResult<Record, ParsingContext> iter) {
+    public static Map<String, Graph<MyVertex, DefaultWeightedEdge>> createGraphsFromDS2(IterableResult<Record, ParsingContext> iter) {
         Map<String, String> map = new HashMap<>();
-        Map<String, Graph<MyVertex, MyEdgeDS2>> graphs = new HashMap<>();
+        Map<String, Graph<MyVertex, DefaultWeightedEdge>> graphs = new HashMap<>();
 
         for (Record row : iter) {
             row.fillFieldMap(map);
 
             String year = map.get("year");
-            Graph<MyVertex, MyEdgeDS2> graph = graphs.computeIfAbsent(year, y -> new SimpleGraph<>(MyEdgeDS2.class));
+            Graph<MyVertex, DefaultWeightedEdge> graph = graphs.computeIfAbsent(year, y -> new SimpleWeightedGraph<>(DefaultWeightedEdge.class));
 
             MyVertex v1 = new MyVertex(map.get("author1"));
             MyVertex v2 = new MyVertex(map.get("author2"));
             graph.addVertex(v1);
             graph.addVertex(v2);
             try {
-                graph.addEdge(v1, v2, new MyEdgeDS2(Integer.parseInt(map.get("collaborations"))));
+                DefaultWeightedEdge e = graph.addEdge(v1, v2);
+                if (e == null) {
+                    double weight = graph.getEdgeWeight(graph.getEdge(v1, v2));
+                    graph.setEdgeWeight(v1, v2, weight + Double.parseDouble(map.get("collaborations")));
+                } else {
+                    graph.setEdgeWeight(e, Double.parseDouble(map.get("collaborations")));
+                }
             } catch (IllegalArgumentException ex) {
                 Utils.print("self loop " + v1 + " - " + v2);
             }
@@ -105,12 +110,12 @@ public class Preprocessing {
         return graphs;
     }
 
-    public static void writeGraphsFromDS2(Map<String, Graph<MyVertex, MyEdgeDS2>> graphs)
+    public static void writeGraphsFromDS2(Map<String, Graph<MyVertex, DefaultWeightedEdge>> graphs)
             throws IOException, ExportException, URISyntaxException, TransformerException {
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, Graph<MyVertex, MyEdgeDS2>> entry : graphs.entrySet()) {
+        for (Map.Entry<String, Graph<MyVertex, DefaultWeightedEdge>> entry : graphs.entrySet()) {
             String filename = entry.getKey();
-            Graph<MyVertex, MyEdgeDS2> graph = entry.getValue();
+            Graph<MyVertex, DefaultWeightedEdge> graph = entry.getValue();
             int vertSize = graph.vertexSet().size();
             int edgeSize = graph.edgeSet().size();
             Utils.print("Graph " + filename + ": vertSize " + vertSize + ", edgeSize " + edgeSize);
