@@ -5,6 +5,7 @@ import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxRectangle;
+import guru.nidi.graphviz.attribute.Color;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
@@ -28,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GraphUtils {
@@ -102,6 +104,19 @@ public class GraphUtils {
 
     public static void writeImage(File dot, String path, String name) throws IOException, URISyntaxException {
         MutableGraph g = Parser.read(dot);
+        File imgFile = Utils.getNewFile(path, name, "svg");
+        Utils.print(imgFile.getParentFile().exists());
+        Graphviz.fromGraph(g).width(700).render(Format.SVG).toFile(imgFile);
+    }
+
+    public static void writeImage(File dot, String path, String name, List<String> nodes) throws IOException, URISyntaxException {
+        MutableGraph g = Parser.read(dot);
+        g.nodes().forEach(node -> {
+//            Utils.print("Node: " + node);
+            if (nodes.contains(node.name().toString())) {
+                node.add(Color.RED);
+            }
+        });
         File imgFile = Utils.getNewFile(path, name, "svg");
         Utils.print(imgFile.getParentFile().exists());
         Graphviz.fromGraph(g).width(700).render(Format.SVG).toFile(imgFile);

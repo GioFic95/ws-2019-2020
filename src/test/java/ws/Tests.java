@@ -12,6 +12,8 @@ import ws.myGraph.MyVertex;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,6 +117,10 @@ public class Tests {
         Utils.print("two graphs are equal: " + graphTxt.equals(graphTxt1));
         File myFile1 = saveDS2Graph(graph1, "MyGraphDS2_1");
         writeImage(myFile1, "plots/ds2", "MyGraphDS2_1");
+
+        // change color of some node
+        String[] s = new String[]{"v2", "v3"};
+        writeImage(myFile1, "plots/ds2", "MyGraphDS2_2", Arrays.asList(s));
     }
 
     @org.jetbrains.annotations.NotNull
