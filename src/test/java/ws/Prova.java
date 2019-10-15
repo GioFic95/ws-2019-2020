@@ -40,7 +40,19 @@ public class Prova {
 //        s.add(v4bis);
 //        Utils.print(s);
 
-        Utils.writeLog(new StringBuilder("prova prova"), "prova");
+//        Utils.writeLog(new StringBuilder("prova prova"), "prova");
+
+        Map<String, Long> map = new HashMap<>();
+        map.put("ciao", 7L);
+        map.put("a", 1L);
+        Long max = Collections.max(map.values())/2;
+        Utils.print(max);
+
+        Map<String, Double> mapd = new HashMap<>();
+        mapd.put("ciao", 7.0);
+        mapd.put("a", 1.0);
+        Double maxd = Collections.max(mapd.values())/2;
+        Utils.print(maxd);
     }
 
 }

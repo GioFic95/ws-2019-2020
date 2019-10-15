@@ -6,11 +6,13 @@ import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxRectangle;
 import guru.nidi.graphviz.attribute.Color;
+import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.parse.Parser;
 import org.jgrapht.Graph;
+import org.jgrapht.alg.scoring.PageRank;
 import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -114,7 +116,7 @@ public class GraphUtils {
         g.nodes().forEach(node -> {
 //            Utils.print("Node: " + node);
             if (nodes.contains(node.name().toString())) {
-                node.add(Color.RED);
+                node.add(Color.CYAN, Style.FILLED);
             }
         });
         File imgFile = Utils.getNewFile(path, name, "svg");
@@ -137,4 +139,9 @@ public class GraphUtils {
         transformer.transform(input, output);
     }
 
+    public static Map<MyVertex, Double> authorsPageRank(String year) throws ImportException, IOException, URISyntaxException {
+        Graph<MyVertex, MyEdgeDS1> graph = loadDS1Graph(year);
+        PageRank<MyVertex, MyEdgeDS1> pageRank = new PageRank<>(graph);
+        return pageRank.getScores();
+    }
 }
