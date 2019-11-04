@@ -16,11 +16,26 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
+/**
+ * Class used to perform all the jobs related to the first task.
+ */
 public class Task1 {
+
+    /**
+     * Enum used to select which scoring one wants to use for the scoring.
+     */
     private enum Scoring {
         CLUSTERING_COEFFICIENT, BETWEENNESS_CENTRALITY, CLOSENESS_CENTRALITY, ALPHA_CENTRALITY, PAGE_RANK
     }
 
+    /**
+     * Make several trials with different centrality measures and different "weights", by calling
+     * {@link #computeScoring(Graph, Scoring, Weight, double, double, int)} with different parameters.
+     * @see Weight and its sublasses.
+     * @throws URISyntaxException if there are problems reading an input graph or creating an output file.
+     * @throws IOException if there are problems reading an input graph or creating an output file.
+     * @throws ImportException if there are problems reading an input graph.
+     */
     public static void tryMeasures() throws URISyntaxException, IOException, ImportException {
         StringBuilder sbCCoeff = new StringBuilder();
         StringBuilder sbCc = new StringBuilder();
@@ -46,7 +61,6 @@ public class Task1 {
                 GraphUtils.writeImage(dot, "plots/ccoeff", year + "_" + k, topCCoeff);
                 sbCCoeff.append(year + "\t" + k + "\t" + topCCoeff + "\n");
 
-                /*
                 // betweenness centrality
                 List<String> topBc = computeScoring(graph, Scoring.BETWEENNESS_CENTRALITY, k);
                 Utils.print(topBc);
@@ -69,7 +83,7 @@ public class Task1 {
                 List<String> topPr = computeScoring(graph, Scoring.PAGE_RANK, k);
                 Utils.print(topPr);
                 GraphUtils.writeImage(dot, "plots/pr", year + "_" + k, topPr);
-                sbPr.append(year + "\t" + k + "\t" + topPr + "\n"); */
+                sbPr.append(year + "\t" + k + "\t" + topPr + "\n");
 
                 // weighted clustering coefficient
                 Weight<MyVertex, MyEdgeDS1> weight = new SimpleWeight(graph);
@@ -128,10 +142,16 @@ public class Task1 {
         Utils.writeLog(sbCCPrW,"close_centr_pr_weighed");
     }
 
-    private static List<String> computeScoring(Graph<MyVertex, MyEdgeDS1> graph, Scoring scoring, int k) {
-        return computeScoring(graph, scoring, null, 0, 0, k);
-    }
-
+    /**
+     * Compute the list of the top k nodes, according to the specified scoring and weight.
+     * @param graph   The input graph, on which to compute the desired scoring.
+     * @param scoring The scoring measure to be used.
+     * @param weight  The weight to be applied jointly with the scoring (effectively, this is another scoring measure).
+     * @param a       The proportion in which the scoring is considered compared to the weight.
+     * @param b       The proportion in which the weight is considered compared to the scoring.
+     * @param k       How many nodes to pick as the "top ones".
+     * @return        The list of the ids of the top k nodes, according to the specified scoring and weight.
+     */
     private static List<String> computeScoring(
             Graph<MyVertex, MyEdgeDS1> graph, Scoring scoring, Weight<MyVertex, MyEdgeDS1> weight, double a, double b, int k) {
         k = Integer.min(k, graph.vertexSet().size());
@@ -169,5 +189,16 @@ public class Task1 {
             topK.add(topVertex.getId());
         }
         return topK;
+    }
+
+    /**
+     * A shortcut for {@link #computeScoring(Graph, Scoring, Weight, double, double, int)} with weight=null, a=0, b=0.
+     * @param graph   The input graph, on which to compute the desired scoring.
+     * @param scoring The scoring measure to be used.
+     * @param k       How many nodes to pick as the "top ones".
+     * @return        The list of the ids of the top k nodes, according to the specified scoring and weight.
+     */
+    private static List<String> computeScoring(Graph<MyVertex, MyEdgeDS1> graph, Scoring scoring, int k) {
+        return computeScoring(graph, scoring, null, 0, 0, k);
     }
 }

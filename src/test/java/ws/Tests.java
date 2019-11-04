@@ -6,8 +6,10 @@ import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.io.ExportException;
 import org.jgrapht.io.ImportException;
+import ws.myGraph.GraphUtils;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
+import ws.weights.PageRankWeight;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +29,12 @@ public class Tests {
 //        demoDS1();
 
         // test dataset 2 stuff
-        demoDS2();
+//        demoDS2();
+
+        // test PageRankWeight
+        Graph<MyVertex, MyEdgeDS1> g = GraphUtils.loadDS1Graph("2018");
+        PageRankWeight prw = new PageRankWeight(g, "2018");
+        Utils.print(prw.getScores());
     }
 
     public static void demoDS1() throws ExportException, IOException, ImportException, URISyntaxException {

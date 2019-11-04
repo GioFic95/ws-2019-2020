@@ -16,6 +16,18 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 public class Main {
+
+    /**
+     * Execute all the preprocessing steps.
+     * It calls {@link Preprocessing#readDS(String[], String)} on the first dataset,
+     * then {@link Preprocessing#createGraphsFromDS1(IterableResult)}.
+     * It calls {@link Preprocessing#readDS(String[], String)} on the second dataset,
+     * then {@link Preprocessing#createGraphsFromDS2(IterableResult)}.
+     * @throws ExportException if raised by {@link Preprocessing#writeGraphsFromDS1(Map)} or {@link Preprocessing#writeGraphsFromDS2(Map)}.
+     * @throws IOException if raised by {@link Preprocessing#writeGraphsFromDS1(Map)} or {@link Preprocessing#writeGraphsFromDS2(Map)}.
+     * @throws URISyntaxException if raised by {@link Preprocessing#writeGraphsFromDS1(Map)} or {@link Preprocessing#writeGraphsFromDS2(Map)}.
+     * @throws TransformerException if raised by {@link Preprocessing#writeGraphsFromDS2(Map)}.
+     */
     private static void preprocessing() throws ExportException, IOException, URISyntaxException, TransformerException {
         // preprocess DS1
         IterableResult<Record, ParsingContext> iter1 = Preprocessing.readDS(
@@ -30,8 +42,18 @@ public class Main {
         Preprocessing.writeGraphsFromDS2(graphs2);
     }
 
+    /**
+     * Execute all the steps of the preprocessing phase by calling {@link #preprocessing()}, then all the steps of the
+     * first task by calling {@link Task1#tryMeasures()}.
+     * @param args Not needed.
+     * @throws ExportException if raised by {@link #preprocessing()}.
+     * @throws TransformerException if raised by {@link #preprocessing()}.
+     * @throws IOException if raised by {@link Task1#tryMeasures()} or by {@link #preprocessing()}.
+     * @throws URISyntaxException if raised by {@link Task1#tryMeasures()} or by {@link #preprocessing()}.
+     * @throws ImportException if raised by {@link Task1#tryMeasures()}.
+     */
     public static void main(String... args) throws ExportException, IOException, URISyntaxException, TransformerException, ImportException {
-//        preprocessing();
+        preprocessing();
 
         Task1.tryMeasures();
     }

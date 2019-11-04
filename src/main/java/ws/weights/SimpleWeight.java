@@ -11,12 +11,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * A {@link Weight} based on the number of occurrences of the keywords in the articles.
+ */
 public class SimpleWeight extends Weight<MyVertex, MyEdgeDS1> {
 
+    /**
+     * Create a new weighting of the given graph, based on the number of occurrences of the keywords in the articles.
+     * @param graph The graph to be weighted.
+     */
     public SimpleWeight(Graph<MyVertex, MyEdgeDS1> graph) {
         super(graph);
     }
 
+    /**
+     * Computes the weighting of the graph, by assigning to each node the normalized sum of the occurrences
+     * of the keyword contained in the node into the articles that appears on the edges incident on that node.
+     * @return A weighting of the graph based on the number of occurrences of the keywords in the articles.
+     * @see MyEdgeDS1#getAuthors() MyEdgeDS1.getAuthors
+     * @see MyVertex#getValue() MyVertex.getValue
+     */
     @Override
     public Map<MyVertex, Double> getScores() {
         NeighborCache<MyVertex, MyEdgeDS1> neighborGraph = new NeighborCache<>(graph);

@@ -7,7 +7,6 @@ import com.univocity.parsers.tsv.TsvParser;
 import com.univocity.parsers.tsv.TsvParserSettings;
 import guru.nidi.graphviz.engine.GraphvizException;
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.graph.SimpleWeightedGraph;
@@ -27,8 +26,18 @@ import java.util.Map;
 
 import static ws.Utils.*;
 
+/**
+ * Class used to perform all the jobs related to the preprocessing phase.
+ */
 public class Preprocessing {
 
+    /**
+     * A commodity function to easily parse TSV files.
+     * @param headers The names of the columns to be used.
+     * @param path    The path where the TSV file is located.
+     * @return        An {@link IterableResult} to be used to read the rows of the TSV file.
+     * @see <a href="https://www.univocity.com/pages/univocity_parsers_tsv.html" target="_blank">Univocity parsers</a>.
+     */
     public static IterableResult<Record, ParsingContext> readDS(String[] headers, String path) {
         TsvParserSettings settings = new TsvParserSettings();
         settings.setHeaderExtractionEnabled(false);
@@ -39,6 +48,12 @@ public class Preprocessing {
         return parser.iterateRecords(ds);
     }
 
+    /**
+     * Reads the content of the DS1 file and produces a {@link Map} that has the years as keys and the relative
+     * keywords graphs as values.
+     * @param iter The content of the DS1 file, as returned by {@link #readDS(String[], String)}.
+     * @return A {@link Map} that has the years as keys and the relative graphs as values.
+     */
     public static Map<String, Graph<MyVertex, MyEdgeDS1>> createGraphsFromDS1(IterableResult<Record, ParsingContext> iter) {
         Map<String, String> map = new HashMap<>();
         Map<String, Graph<MyVertex, MyEdgeDS1>> graphs = new HashMap<>();
@@ -68,6 +83,14 @@ public class Preprocessing {
         return graphs;
     }
 
+    /**
+     * Takes the result of {@link #createGraphsFromDS1(IterableResult)} and, for each graph, serializes and writes it
+     * in a DOT file, then takes the serialized graph and uses it to produce a plot.
+     * @param graphs The {@link Map} returned by {@link #createGraphsFromDS1(IterableResult)}.
+     * @throws ExportException if raised by {@link GraphUtils#saveDS1Graph(Graph, String)}.
+     * @throws IOException if raised by {@link GraphUtils#saveDS1Graph(Graph, String)} or {@link GraphUtils#writeImage(File, String, String)}.
+     * @throws URISyntaxException if raised by {@link GraphUtils#saveDS1Graph(Graph, String)} or {@link GraphUtils#writeImage(File, String, String)}.
+     */
     public static void writeGraphsFromDS1(Map<String, Graph<MyVertex, MyEdgeDS1>> graphs)
             throws ExportException, IOException, URISyntaxException {
         for (Map.Entry<String, Graph<MyVertex, MyEdgeDS1>> entry : graphs.entrySet()) {
@@ -81,6 +104,12 @@ public class Preprocessing {
         }
     }
 
+    /**
+     * Reads the content of the DS2 file and produces a {@link Map} that has the years as keys and the relative authors
+     * graphs as values.
+     * @param iter The content of the DS2 file, as returned by {@link #readDS(String[], String)}.
+     * @return A {@link Map} that has the years as keys and the relative graphs as values.
+     */
     public static Map<String, Graph<MyVertex, DefaultWeightedEdge>> createGraphsFromDS2(IterableResult<Record, ParsingContext> iter) {
         Map<String, String> map = new HashMap<>();
         Map<String, Graph<MyVertex, DefaultWeightedEdge>> graphs = new HashMap<>();
@@ -110,6 +139,17 @@ public class Preprocessing {
         return graphs;
     }
 
+    /**
+     * Takes the result of {@link #createGraphsFromDS2(IterableResult)} and, for each graph, serializes and writes it
+     * in a DOT file, then takes the serialized graph and uses it to produce a plot.
+     * By default, the plot is created using {@link GraphUtils#writeImage(File, String, String)}, but, if the graph is
+     * too big for GraphViz, it falls back on {@link GraphUtils#writeImage(Graph, String, String)}.
+     * @param graphs The {@link Map} returned by {@link #createGraphsFromDS2(IterableResult)}.
+     * @throws ExportException rethrown if raised by {@link GraphUtils#saveDS2Graph(Graph, String)}.
+     * @throws IOException rethrown if raised by {@link GraphUtils#saveDS2Graph(Graph, String)} or {@link GraphUtils#writeImage(File, String, String)}.
+     * @throws URISyntaxException rethrown if raised by {@link GraphUtils#saveDS2Graph(Graph, String)} or {@link GraphUtils#writeImage(File, String, String)} or {@link GraphUtils#writeImage(Graph, String, String)}.
+     * @throws TransformerException rethrown if raised by {@link GraphUtils#writeImage(Graph, String, String)}.
+     */
     public static void writeGraphsFromDS2(Map<String, Graph<MyVertex, DefaultWeightedEdge>> graphs)
             throws IOException, ExportException, URISyntaxException, TransformerException {
         StringBuilder sb = new StringBuilder();
