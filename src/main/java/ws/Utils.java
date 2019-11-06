@@ -1,11 +1,17 @@
 package ws;
 
+import com.univocity.parsers.common.IterableResult;
+import com.univocity.parsers.common.ParsingContext;
+import com.univocity.parsers.common.record.Record;
+import com.univocity.parsers.tsv.TsvParser;
+import com.univocity.parsers.tsv.TsvParserSettings;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -59,6 +65,23 @@ public class Utils {
         try (FileWriter writer = new FileWriter(f)) {
             writer.write(sb.toString());
         }
+    }
+
+    /**
+     * A commodity function to easily parse TSV files.
+     * @param headers The names of the columns to be used.
+     * @param path    The path where the TSV file is located.
+     * @return        An {@link IterableResult} to be used to read the rows of the TSV file.
+     * @see <a href="https://www.univocity.com/pages/univocity_parsers_tsv.html" target="_blank">Univocity parsers</a>.
+     */
+    public static IterableResult<Record, ParsingContext> readTSV(String[] headers, String path) {
+        TsvParserSettings settings = new TsvParserSettings();
+        settings.setHeaderExtractionEnabled(false);
+        settings.setHeaders(headers);
+        TsvParser parser = new TsvParser(settings);
+
+        InputStream ds = Preprocessing.class.getResourceAsStream(path);
+        return parser.iterateRecords(ds);
     }
 
     /**

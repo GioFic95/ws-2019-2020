@@ -3,8 +3,6 @@ package ws;
 import com.univocity.parsers.common.IterableResult;
 import com.univocity.parsers.common.ParsingContext;
 import com.univocity.parsers.common.record.Record;
-import com.univocity.parsers.tsv.TsvParser;
-import com.univocity.parsers.tsv.TsvParserSettings;
 import guru.nidi.graphviz.engine.GraphvizException;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -19,7 +17,6 @@ import ws.myGraph.MyVertex;
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,26 +29,9 @@ import static ws.Utils.*;
 public class Preprocessing {
 
     /**
-     * A commodity function to easily parse TSV files.
-     * @param headers The names of the columns to be used.
-     * @param path    The path where the TSV file is located.
-     * @return        An {@link IterableResult} to be used to read the rows of the TSV file.
-     * @see <a href="https://www.univocity.com/pages/univocity_parsers_tsv.html" target="_blank">Univocity parsers</a>.
-     */
-    public static IterableResult<Record, ParsingContext> readDS(String[] headers, String path) {
-        TsvParserSettings settings = new TsvParserSettings();
-        settings.setHeaderExtractionEnabled(false);
-        settings.setHeaders(headers);
-        TsvParser parser = new TsvParser(settings);
-
-        InputStream ds = Preprocessing.class.getResourceAsStream(path);
-        return parser.iterateRecords(ds);
-    }
-
-    /**
      * Reads the content of the DS1 file and produces a {@link Map} that has the years as keys and the relative
      * keywords graphs as values.
-     * @param iter The content of the DS1 file, as returned by {@link #readDS(String[], String)}.
+     * @param iter The content of the DS1 file, as returned by {@link Utils#readTSV(String[], String)}.
      * @return A {@link Map} that has the years as keys and the relative graphs as values.
      */
     public static Map<String, Graph<MyVertex, MyEdgeDS1>> createGraphsFromDS1(IterableResult<Record, ParsingContext> iter) {
@@ -107,7 +87,7 @@ public class Preprocessing {
     /**
      * Reads the content of the DS2 file and produces a {@link Map} that has the years as keys and the relative authors
      * graphs as values.
-     * @param iter The content of the DS2 file, as returned by {@link #readDS(String[], String)}.
+     * @param iter The content of the DS2 file, as returned by {@link Utils#readTSV(String[], String)}.
      * @return A {@link Map} that has the years as keys and the relative graphs as values.
      */
     public static Map<String, Graph<MyVertex, DefaultWeightedEdge>> createGraphsFromDS2(IterableResult<Record, ParsingContext> iter) {

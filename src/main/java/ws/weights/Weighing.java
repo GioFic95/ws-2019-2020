@@ -47,7 +47,6 @@ public class Weighing {
                     .filter(entry -> authors.containsKey(entry.getKey().getValue()))
                     .mapToDouble(entry -> entry.getValue() * authors.get(entry.getKey().getValue())).sum();
         };
-
         return new AsWeightedGraph<>(graph, f, true, false);
     }
 

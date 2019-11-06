@@ -1,9 +1,14 @@
-package ws;
+package ws.task1;
 
+import com.univocity.parsers.common.IterableResult;
+import com.univocity.parsers.common.ParsingContext;
+import com.univocity.parsers.common.record.Record;
 import org.jgrapht.Graph;
-import org.jgrapht.alg.scoring.*;
 
+import org.jgrapht.alg.util.NeighborCache;
 import org.jgrapht.io.ImportException;
+import org.json.JSONArray;
+import ws.Utils;
 import ws.myGraph.GraphUtils;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
@@ -16,21 +21,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
+import static ws.Utils.print;
+
 /**
  * Class used to perform all the jobs related to the first task.
  */
 public class Task1 {
 
     /**
-     * Enum used to select which scoring one wants to use for the scoring.
-     */
-    private enum Scoring {
-        CLUSTERING_COEFFICIENT, BETWEENNESS_CENTRALITY, CLOSENESS_CENTRALITY, ALPHA_CENTRALITY, PAGE_RANK
-    }
-
-    /**
      * Make several trials with different centrality measures and different "weights", by calling
-     * {@link #computeScoring(Graph, Scoring, Weight, double, double, int)} with different parameters.
+     * {@link Scoring#computeScoring(Graph, Scoring.ScoringMeasure, Weight, double, double, int)} with different parameters.
      * @see Weight and its sublasses.
      * @throws URISyntaxException if there are problems reading an input graph or creating an output file.
      * @throws IOException if there are problems reading an input graph or creating an output file.
@@ -56,73 +56,73 @@ public class Task1 {
                 File dot = Utils.getNewFile("graphs/ds1", year, "dot");
 
                 // clustering coefficient
-                List<String> topCCoeff = computeScoring(graph, Scoring.CLUSTERING_COEFFICIENT, k);
+                List<String> topCCoeff = Scoring.computeScoring(graph, Scoring.ScoringMeasure.CLUSTERING_COEFFICIENT, k);
                 Utils.print(topCCoeff);
                 GraphUtils.writeImage(dot, "plots/ccoeff", year + "_" + k, topCCoeff);
                 sbCCoeff.append(year + "\t" + k + "\t" + topCCoeff + "\n");
 
                 // betweenness centrality
-                List<String> topBc = computeScoring(graph, Scoring.BETWEENNESS_CENTRALITY, k);
+                List<String> topBc = Scoring.computeScoring(graph, Scoring.ScoringMeasure.BETWEENNESS_CENTRALITY, k);
                 Utils.print(topBc);
                 GraphUtils.writeImage(dot, "plots/bc", year + "_" + k, topBc);
                 sbBc.append(year + "\t" + k + "\t" + topBc + "\n");
 
                 // closeness centrality
-                List<String> topCc = computeScoring(graph, Scoring.CLOSENESS_CENTRALITY, k);
+                List<String> topCc = Scoring.computeScoring(graph, Scoring.ScoringMeasure.CLOSENESS_CENTRALITY, k);
                 Utils.print(topCc);
                 GraphUtils.writeImage(dot, "plots/cc", year + "_" + k, topCc);
                 sbCc.append(year + "\t" + k + "\t" + topCc + "\n");
 
                 // alpha centrality
-                List<String> topAc = computeScoring(graph, Scoring.ALPHA_CENTRALITY, k);
+                List<String> topAc = Scoring.computeScoring(graph, Scoring.ScoringMeasure.ALPHA_CENTRALITY, k);
                 Utils.print(topAc);
                 GraphUtils.writeImage(dot, "plots/ac", year + "_" + k, topAc);
                 sbAc.append(year + "\t" + k + "\t" + topAc + "\n");
 
                 // page rank
-                List<String> topPr = computeScoring(graph, Scoring.PAGE_RANK, k);
+                List<String> topPr = Scoring.computeScoring(graph, Scoring.ScoringMeasure.PAGE_RANK, k);
                 Utils.print(topPr);
                 GraphUtils.writeImage(dot, "plots/pr", year + "_" + k, topPr);
                 sbPr.append(year + "\t" + k + "\t" + topPr + "\n");
 
                 // weighted clustering coefficient
                 Weight<MyVertex, MyEdgeDS1> weight = new SimpleWeight(graph);
-                List<String> topCCoeffW = computeScoring(graph, Scoring.CLUSTERING_COEFFICIENT, weight, 0.9, 0.1, k);
+                List<String> topCCoeffW = Scoring.computeScoring(graph, Scoring.ScoringMeasure.CLUSTERING_COEFFICIENT, weight, 0.9, 0.1, k);
                 Utils.print(topCCoeffW);
                 GraphUtils.writeImage(dot, "plots/ccoeffw", year + "_" + k, topCCoeffW);
                 sbCCoeffW.append(year + "\t" + k + "\t" + topCCoeffW + "\n");
 
                 // clustering coefficient weighted with page rank of the authors
                 Weight<MyVertex, MyEdgeDS1> weightPr = new PageRankWeight(graph, year);
-                List<String> topCCoeffPr = computeScoring(graph, Scoring.CLUSTERING_COEFFICIENT, weightPr, 0.5, 0.5, k);
+                List<String> topCCoeffPr = Scoring.computeScoring(graph, Scoring.ScoringMeasure.CLUSTERING_COEFFICIENT, weightPr, 0.5, 0.5, k);
                 Utils.print(topCCoeffPr);
                 GraphUtils.writeImage(dot, "plots/ccoeffpr", year + "_" + k, topCCoeffPr);
                 sbCCoeffPr.append(year + "\t" + k + "\t" + topCCoeffPr + "\n");
 
                 // clustering coefficient weighted with page rank of the authors and number of occurrences of the pair of keywords
                 Weight weightPrW = Weight.compose(new SimpleWeight(graph), new PageRankWeight(graph, year), 0.5, 0.5);
-                List<String> topCCoeffPrW = computeScoring(graph, Scoring.CLUSTERING_COEFFICIENT, weightPrW, 0.5, 0.5, k);
+                List<String> topCCoeffPrW = Scoring.computeScoring(graph, Scoring.ScoringMeasure.CLUSTERING_COEFFICIENT, weightPrW, 0.5, 0.5, k);
                 Utils.print(topCCoeffPrW);
                 GraphUtils.writeImage(dot, "plots/ccoeffprw", year + "_" + k, topCCoeffPrW);
                 sbCCoeffPrW.append(year + "\t" + k + "\t" + topCCoeffPrW + "\n");
 
                 // weighted closeness centrality
                 Weight<MyVertex, MyEdgeDS1> weightCC = new SimpleWeight(graph);
-                List<String> topCCW = computeScoring(graph, Scoring.CLOSENESS_CENTRALITY, weightCC, 0.9, 0.1, k);
+                List<String> topCCW = Scoring.computeScoring(graph, Scoring.ScoringMeasure.CLOSENESS_CENTRALITY, weightCC, 0.9, 0.1, k);
                 Utils.print(topCCW);
                 GraphUtils.writeImage(dot, "plots/ccw", year + "_" + k, topCCW);
                 sbCCW.append(year + "\t" + k + "\t" + topCCW + "\n");
 
                 // closeness centrality weighted with page rank of the authors
                 Weight<MyVertex, MyEdgeDS1> weightCCPr = new PageRankWeight(graph, year);
-                List<String> topCCPr = computeScoring(graph, Scoring.CLOSENESS_CENTRALITY, weightCCPr, 0.5, 0.5, k);
+                List<String> topCCPr = Scoring.computeScoring(graph, Scoring.ScoringMeasure.CLOSENESS_CENTRALITY, weightCCPr, 0.5, 0.5, k);
                 Utils.print(topCCPr);
                 GraphUtils.writeImage(dot, "plots/ccpr", year + "_" + k, topCCPr);
                 sbCCPr.append(year + "\t" + k + "\t" + topCCPr + "\n");
 
                 // closeness centrality weighted with page rank of the authors and number of occurrences of the pair of keywords
                 Weight weightCCPrW = Weight.compose(new SimpleWeight(graph), new PageRankWeight(graph, year), 0.5, 0.5);
-                List<String> topCCPrW = computeScoring(graph, Scoring.CLOSENESS_CENTRALITY, weightCCPrW, 0.5, 0.5, k);
+                List<String> topCCPrW = Scoring.computeScoring(graph, Scoring.ScoringMeasure.CLOSENESS_CENTRALITY, weightCCPrW, 0.5, 0.5, k);
                 Utils.print(topCCPrW);
                 GraphUtils.writeImage(dot, "plots/ccprw", year + "_" + k, topCCPrW);
                 sbCCPrW.append(year + "\t" + k + "\t" + topCCPrW + "\n");
@@ -142,63 +142,21 @@ public class Task1 {
         Utils.writeLog(sbCCPrW,"close_centr_pr_weighed");
     }
 
-    /**
-     * Compute the list of the top k nodes, according to the specified scoring and weight.
-     * @param graph   The input graph, on which to compute the desired scoring.
-     * @param scoring The scoring measure to be used.
-     * @param weight  The weight to be applied jointly with the scoring (effectively, this is another scoring measure).
-     * @param a       The proportion in which the scoring is considered compared to the weight.
-     * @param b       The proportion in which the weight is considered compared to the scoring.
-     * @param k       How many nodes to pick as the "top ones".
-     * @return        The list of the ids of the top k nodes, according to the specified scoring and weight.
-     */
-    private static List<String> computeScoring(
-            Graph<MyVertex, MyEdgeDS1> graph, Scoring scoring, Weight<MyVertex, MyEdgeDS1> weight, double a, double b, int k) {
-        k = Integer.min(k, graph.vertexSet().size());
-        final Map<MyVertex, Double> scores;
-        switch (scoring) {
-            case CLUSTERING_COEFFICIENT:
-                scores = new HashMap<>(new ClusteringCoefficient<>(graph).getScores());
-                break;
-            case BETWEENNESS_CENTRALITY:
-                scores = new HashMap<>(new BetweennessCentrality<>(graph).getScores());
-                break;
-            case CLOSENESS_CENTRALITY:
-                scores = new HashMap<>(new ClosenessCentrality<>(graph).getScores());
-                break;
-            case ALPHA_CENTRALITY:
-                scores = new HashMap<>(new AlphaCentrality<>(graph).getScores());
-                break;
-            case PAGE_RANK:
-                scores = new HashMap<>(new PageRank<>(graph).getScores());
-                break;
-            default:
-                throw new IllegalArgumentException("scoring not supported");
-        }
-        Utils.print("scores" + scores);
-        List<String> topK = new ArrayList<>();
-        if (weight != null) {
-            Map<?, Double> weights = weight.getScores();
-            Utils.print("weights" + weights);
-            scores.forEach((myVertex, score) -> scores.put(myVertex, (score * a) + (weights.get(myVertex) * b)));
-            Utils.print("scores" + scores);
-        }
-        for (int i=0; i<k; i++) {
-            MyVertex topVertex = Collections.max(scores.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey();
-            scores.remove(topVertex);
-            topK.add(topVertex.getId());
-        }
-        return topK;
-    }
+    public static void spreadInfluence(String logPath) throws ImportException, IOException, URISyntaxException {
+        IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "k", "seeds"}, logPath);
 
-    /**
-     * A shortcut for {@link #computeScoring(Graph, Scoring, Weight, double, double, int)} with weight=null, a=0, b=0.
-     * @param graph   The input graph, on which to compute the desired scoring.
-     * @param scoring The scoring measure to be used.
-     * @param k       How many nodes to pick as the "top ones".
-     * @return        The list of the ids of the top k nodes, according to the specified scoring and weight.
-     */
-    private static List<String> computeScoring(Graph<MyVertex, MyEdgeDS1> graph, Scoring scoring, int k) {
-        return computeScoring(graph, scoring, null, 0, 0, k);
+        for (Record row : ir) {
+            String year = row.getString("year");
+            List<String> seeds = new ArrayList<>();
+            JSONArray jsonArray = new JSONArray(row.getString("seeds"));
+            for (int i=0; i<jsonArray.length(); i++) {
+                seeds.add(jsonArray.get(i).toString());
+            }
+            Utils.print("year: " + year + ", seeds: " + seeds);
+
+            Graph<MyVertex, MyEdgeDS1> graph = GraphUtils.loadDS1Graph(year);
+            Map<String, List<String>> independentCascade = SpreadingOfInfluence.independentCascade(graph, year, seeds);
+            Utils.print("Independent Cascade: " + independentCascade);
+        }
     }
 }

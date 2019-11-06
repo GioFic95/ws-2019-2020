@@ -9,6 +9,7 @@ import org.jgrapht.io.ExportException;
 import org.jgrapht.io.ImportException;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
+import ws.task1.Task1;
 
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
@@ -19,9 +20,9 @@ public class Main {
 
     /**
      * Execute all the preprocessing steps.
-     * It calls {@link Preprocessing#readDS(String[], String)} on the first dataset,
+     * It calls {@link Utils#readTSV(String[], String)} on the first dataset,
      * then {@link Preprocessing#createGraphsFromDS1(IterableResult)}.
-     * It calls {@link Preprocessing#readDS(String[], String)} on the second dataset,
+     * It calls {@link Utils#readTSV(String[], String)} on the second dataset,
      * then {@link Preprocessing#createGraphsFromDS2(IterableResult)}.
      * @throws ExportException if raised by {@link Preprocessing#writeGraphsFromDS1(Map)} or {@link Preprocessing#writeGraphsFromDS2(Map)}.
      * @throws IOException if raised by {@link Preprocessing#writeGraphsFromDS1(Map)} or {@link Preprocessing#writeGraphsFromDS2(Map)}.
@@ -30,13 +31,13 @@ public class Main {
      */
     private static void preprocessing() throws ExportException, IOException, URISyntaxException, TransformerException {
         // preprocess DS1
-        IterableResult<Record, ParsingContext> iter1 = Preprocessing.readDS(
+        IterableResult<Record, ParsingContext> iter1 = Utils.readTSV(
                 new String[]{"year", "keyword1", "keyword2", "authors"},"dataset/ds-1.tsv");
         Map<String, Graph<MyVertex, MyEdgeDS1>> graphs1 = Preprocessing.createGraphsFromDS1(iter1);
         Preprocessing.writeGraphsFromDS1(graphs1);
 
         // preprocess DS2
-        IterableResult<Record, ParsingContext> iter2 = Preprocessing.readDS(
+        IterableResult<Record, ParsingContext> iter2 = Utils.readTSV(
                 new String[]{"year", "author1", "author2", "collaborations"},"dataset/ds-2.tsv");
         Map<String, Graph<MyVertex, DefaultWeightedEdge>> graphs2 = Preprocessing.createGraphsFromDS2(iter2);
         Preprocessing.writeGraphsFromDS2(graphs2);
@@ -53,8 +54,8 @@ public class Main {
      * @throws ImportException if raised by {@link Task1#tryMeasures()}.
      */
     public static void main(String... args) throws ExportException, IOException, URISyntaxException, TransformerException, ImportException {
-        preprocessing();
-
+//        preprocessing();
         Task1.tryMeasures();
+//        Task1.spreadInfluence("logs/close_centr_pr_weighed__2019_11_04__01_31_17.txt");
     }
 }
