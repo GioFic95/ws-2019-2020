@@ -49,7 +49,8 @@ public class SpreadingOfInfluence {
         // Normalize with the max weight.
         double max = Collections.max(probabilities.values());
         probabilities = probabilities.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey, entry -> Math.log(entry.getValue())/Math.log(max)));
+//                Map.Entry::getKey, entry -> Math.log(entry.getValue())/Math.log(max)));
+                Map.Entry::getKey, entry -> entry.getValue()/max));
         Utils.print("PropagationProbabilities: " + probabilities);
         return probabilities;
     }
@@ -82,7 +83,8 @@ public class SpreadingOfInfluence {
                 newNodes.add(node.getId());
 
                 for (MyVertex follower : neighborGraph.neighborsOf(node)) {
-                    MyEdgeDS1 myEdge = graph.getEdge(s, node);
+                    Utils.print("edge: " + node + " - " + follower);
+                    MyEdgeDS1 myEdge = graph.getEdge(node, follower);
                     float randnum = ran.nextFloat();
                     double prob = probabilities.get(myEdge);
                     Utils.print("rand: " + randnum + ", prob: " + prob);

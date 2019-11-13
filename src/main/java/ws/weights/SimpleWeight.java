@@ -6,6 +6,8 @@ import ws.Utils;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,13 +18,15 @@ import java.util.stream.Collectors;
  * A {@link Weight} based on the number of occurrences of the keywords in the articles.
  */
 public class SimpleWeight extends Weight<MyVertex, MyEdgeDS1> {
+    private String year;
 
     /**
      * Create a new weighting of the given graph, based on the number of occurrences of the keywords in the articles.
      * @param graph The graph to be weighted.
      */
-    public SimpleWeight(Graph<MyVertex, MyEdgeDS1> graph) {
-        super(graph);
+    public SimpleWeight(Graph<MyVertex, MyEdgeDS1> graph, String year, String name) {
+        super(graph, name);
+        this.year = year;
     }
 
     /**
@@ -53,8 +57,20 @@ public class SimpleWeight extends Weight<MyVertex, MyEdgeDS1> {
         // Normalize with the max weight.
         double max = Collections.max(map.values());
         map = map.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey, entry -> Math.log(entry.getValue())/Math.log(max)));
-        Utils.print("SimpleWeight scores: " + map);
+                Map.Entry::getKey, entry -> {
+                    double num = entry.getValue(); // entry.getValue() == 0 ? 0 : Math.log(entry.getValue());
+                    double den = max; //Math.log(max);
+                    double res = num/den;
+                    assert res >= 0 && res <= 1 : "id " + entry.getKey().getId() + " " + num + "/" + den + ", max: " + max;
+                    return res;
+                }));
+//        Utils.print("SimpleWeight scores: " + map);
+        try {
+            Utils.writeLog(new StringBuilder(year + "\t" + map + "\n"), "simple_weight_" + name, false);
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+            throw new IllegalStateException("Something went wrong while computing SimpleWeight scores\n" + e.getMessage());
+        }
         return map;
     }
 

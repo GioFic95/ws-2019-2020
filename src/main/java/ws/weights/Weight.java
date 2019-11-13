@@ -14,13 +14,15 @@ import java.util.Map;
  */
 public abstract class Weight<V, E extends DefaultEdge> {
     protected Graph<V, E> graph;
+    protected String name;
 
     /**
      * Create a new weighting of the given graph.
      * @param graph The graph to be weighted.
      */
-    public Weight(Graph<V, E> graph) {
+    public Weight(Graph<V, E> graph, String name) {
         this.graph = graph;
+        this.name = name;
     }
 
     /**
@@ -43,7 +45,7 @@ public abstract class Weight<V, E extends DefaultEdge> {
         if (! w1.graph.equals(w2.graph)) {
             throw new IllegalArgumentException("Incompatible weights: they must refer to the same graph");
         }
-        return new Weight<V, E>(w1.graph) {
+        return new Weight<V, E>(w1.graph, w1.name + "-" + w2.name) {
             @Override
             public Map<V, Double> getScores() {
                 Map<V, Double> scores = w1.getScores();

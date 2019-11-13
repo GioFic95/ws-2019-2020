@@ -8,12 +8,10 @@ import com.univocity.parsers.tsv.TsvParserSettings;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -58,13 +56,24 @@ public class Utils {
      * @throws IOException if it can't write to the created log file.
      * @throws URISyntaxException if raised by {@link #getNewFile(String, String, String)}).
      */
-    public static void writeLog(@NotNull StringBuilder sb, String fileName) throws IOException, URISyntaxException {
+    public static void writeLog(@NotNull StringBuilder sb, String fileName, boolean addDate) throws IOException, URISyntaxException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd__HH_mm_ss");
-        String now = LocalDateTime.now().format(formatter);
-        File f = getNewFile("logs", fileName + "__" + now, "txt");
-        try (FileWriter writer = new FileWriter(f)) {
-            writer.write(sb.toString());
+        String now = addDate ? "__" + LocalDateTime.now().format(formatter) : "";
+        File f = getNewFile("logs", fileName + now, "txt");
+        try (FileWriter writer = new FileWriter(f, true)) {
+            writer.append(sb.toString());
         }
+    }
+
+    /**
+     * todo
+     * @param sb
+     * @param fileName
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static void writeLog(@NotNull StringBuilder sb, String fileName) throws IOException, URISyntaxException {
+        writeLog(sb, fileName, true);
     }
 
     /**
@@ -97,10 +106,24 @@ public class Utils {
     @Contract("_, _, _ -> new")
     public static File getNewFile(String pathName, String fileName, String ext) throws URISyntaxException {
         URI res = Main.class.getResource(pathName).toURI();
-        System.out.println(fileName + " " + new File(res).exists());
+        print(fileName + " " + new File(res).exists());
 
         String path = res.getPath() + "/" + fileName + "." + ext;
-        System.out.println(path);
+        print(path);
         return new File(path);
+    }
+
+    public static void delMatchigFiles(String pathName, String pattern) throws URISyntaxException {
+        URI res = Main.class.getResource(pathName).toURI();
+        File folder = new File(res);
+
+        final File[] files = folder.listFiles((dir, name) -> name.matches( pattern ));
+        if (files != null) {
+            for (final File file : files) {
+                if (!file.delete()) {
+                    throw new IllegalStateException("Can't remove " + file.getAbsolutePath());
+                }
+            }
+        }
     }
 }

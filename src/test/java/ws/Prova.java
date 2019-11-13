@@ -42,17 +42,24 @@ public class Prova {
 
 //        Utils.writeLog(new StringBuilder("prova prova"), "prova");
 
-        Map<String, Long> map = new HashMap<>();
-        map.put("ciao", 7L);
-        map.put("a", 1L);
-        Long max = Collections.max(map.values())/2;
-        Utils.print(max);
+//        Map<String, Long> map = new HashMap<>();
+//        map.put("ciao", 7L);
+//        map.put("a", 1L);
+//        Long max = Collections.max(map.values())/2;
+//        Utils.print(max);
+//
+//        Map<String, Double> mapd = new HashMap<>();
+//        mapd.put("ciao", 7.0);
+//        mapd.put("a", 1.0);
+//        Double maxd = Collections.max(mapd.values())/2;
+//        Utils.print(maxd);
 
-        Map<String, Double> mapd = new HashMap<>();
-        mapd.put("ciao", 7.0);
-        mapd.put("a", 1.0);
-        Double maxd = Collections.max(mapd.values())/2;
-        Utils.print(maxd);
+        Double res = Double.POSITIVE_INFINITY;
+        assert res >= 0 && res <= 1 : "caso 1";
+        Utils.print(res);
+        Double resneg = Double.NEGATIVE_INFINITY;
+        assert resneg >= 0 && resneg <= 1 : "caso 2";
+        Utils.print(resneg);
     }
 
 }

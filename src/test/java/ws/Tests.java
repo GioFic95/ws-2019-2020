@@ -32,9 +32,12 @@ public class Tests {
 //        demoDS2();
 
         // test PageRankWeight
-        Graph<MyVertex, MyEdgeDS1> g = GraphUtils.loadDS1Graph("2018");
-        PageRankWeight prw = new PageRankWeight(g, "2018");
-        Utils.print(prw.getScores());
+//        Graph<MyVertex, MyEdgeDS1> g = GraphUtils.loadDS1Graph("2018");
+//        PageRankWeight prw = new PageRankWeight(g, "2018", "test");
+//        Utils.print(prw.getScores());
+
+        // test delete files according to pattern
+        Utils.delMatchigFiles("test", "(scoring|simple_weight|page_rank)[a-zA-Z_]*\\.txt");
     }
 
     public static void demoDS1() throws ExportException, IOException, ImportException, URISyntaxException {
