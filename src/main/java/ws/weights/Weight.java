@@ -26,7 +26,8 @@ public abstract class Weight<V, E extends DefaultEdge> {
     }
 
     /**
-     * Computes the actual weighting or scoring of the graph, computed according to this weight.
+     * Computes the actual weighting or scoring of the graph, according to this weight.
+     * It should be normalized.
      * @return the weighing of the graph.
      */
     public abstract Map<V, Double> getScores();

@@ -35,145 +35,88 @@ public class Task1 {
      * @throws ImportException if there are problems reading an input graph.
      */
     public static void tryMeasures() throws URISyntaxException, IOException, ImportException {
-        // delete logs about scoring
+        // delete old logs about scoring
         Utils.delMatchigFiles("logs", "(scoring|simple_weight|page_rank)[a-zA-Z_]*\\.txt");
-
-//        StringBuilder sbCCoeff = new StringBuilder();
-//        StringBuilder sbCc = new StringBuilder();
-//        StringBuilder sbBc = new StringBuilder();
-//        StringBuilder sbAc = new StringBuilder();
-//        StringBuilder sbPr = new StringBuilder();
-//        StringBuilder sbCCoeffW = new StringBuilder();
-//        StringBuilder sbCCoeffPr = new StringBuilder();
-//        StringBuilder sbCCoeffPrW = new StringBuilder();
-//        StringBuilder sbCCoeffPrWUnb = new StringBuilder();
-        StringBuilder sbCCoeffPrWMul = new StringBuilder();
-        StringBuilder sbCCoeffPrWUnbMul = new StringBuilder();
-//        StringBuilder sbCCW = new StringBuilder();
-//        StringBuilder sbCCPr = new StringBuilder();
-//        StringBuilder sbCCPrW = new StringBuilder();
-//        StringBuilder sbCCPrWUnb = new StringBuilder();
 
         for (int i=2000; i<=2018; i++) {
             for (int k : new int[]{5, 10, 20, 100}) {
                 String year = String.valueOf(i);
                 Graph<MyVertex, MyEdgeDS1> graph = GraphUtils.loadDS1Graph(year);
                 File dot = Utils.getNewFile("graphs/ds1", year, "dot");
-/*
-                // clustering coefficient
-                List<String> topCCoeff = Scoring.computeScoring(graph, year, "ccoeff", Scoring.ScoringMeasure.CLUSTERING_COEFFICIENT, k);
-                Utils.print(topCCoeff);
-                GraphUtils.writeImage(dot, "plots/ccoeff", year + "_" + k, topCCoeff);
-                sbCCoeff.append(year + "\t" + k + "\t" + topCCoeff + "\n");
+                String name;
+                List<String> top;
+                StringBuilder sb;
 
-                // betweenness centrality
-                List<String> topBc = Scoring.computeScoring(graph, year, "bc", Scoring.ScoringMeasure.BETWEENNESS_CENTRALITY, k);
-                Utils.print(topBc);
-                GraphUtils.writeImage(dot, "plots/bc", year + "_" + k, topBc);
-                sbBc.append(year + "\t" + k + "\t" + topBc + "\n");
+                for (Scoring.ScoringMeasure scoring : Scoring.ScoringMeasure.values()) {
+                    // simple metric
+                    sb = new StringBuilder();
+                    name = scoring.toString() + "_simple";
+                    top = Scoring.computeScoring(graph, year, name, scoring, k);
+                    Utils.print(top);
+                    GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
+                    sb.append(year + "\t" + k + "\t" + top + "\n");
+                    Utils.writeLog(sb, name);
 
-                // closeness centrality
-                List<String> topCc = Scoring.computeScoring(graph, year, "cc", Scoring.ScoringMeasure.CLOSENESS_CENTRALITY, k);
-                Utils.print(topCc);
-                GraphUtils.writeImage(dot, "plots/cc", year + "_" + k, topCc);
-                sbCc.append(year + "\t" + k + "\t" + topCc + "\n");
+                    // metric weighted with SimpleWeight (based on number of papers using that keyword)
+                    sb = new StringBuilder();
+                    name = scoring.toString() + "_weighted";
+                    Weight<MyVertex, MyEdgeDS1> weight = new SimpleWeight(graph, year, name);
+                    top = Scoring.computeScoring(graph, year, name, scoring, weight, 0.5, 0.5, k);
+                    Utils.print(top);
+                    GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
+                    sb.append(year + "\t" + k + "\t" + top + "\n");
+                    Utils.writeLog(sb, name);
 
-                // alpha centrality
-                List<String> topAc = Scoring.computeScoring(graph, year, "ac", Scoring.ScoringMeasure.ALPHA_CENTRALITY, k);
-                Utils.print(topAc);
-                GraphUtils.writeImage(dot, "plots/ac", year + "_" + k, topAc);
-                sbAc.append(year + "\t" + k + "\t" + topAc + "\n");
+                    // metric weighted with page rank of the authors
+                    sb = new StringBuilder();
+                    name = scoring.toString() + "_pr";
+                    Weight<MyVertex, MyEdgeDS1> weightPr = new PageRankWeight(graph, year, name);
+                    top = Scoring.computeScoring(graph, year, name, scoring, weightPr, 0.5, 0.5, k);
+                    Utils.print(top);
+                    GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
+                    sb.append(year + "\t" + k + "\t" + top + "\n");
+                    Utils.writeLog(sb, name);
 
-                // page rank
-                List<String> topPr = Scoring.computeScoring(graph, year, "pr", Scoring.ScoringMeasure.PAGE_RANK, k);
-                Utils.print(topPr);
-                GraphUtils.writeImage(dot, "plots/pr", year + "_" + k, topPr);
-                sbPr.append(year + "\t" + k + "\t" + topPr + "\n");
+                    // metric weighted with page rank of the authors and number of occurrences of the keyword, with equal weights
+                    sb = new StringBuilder();
+                    name = scoring.toString() + "_prw";
+                    Weight weightPrW = Weight.compose(new SimpleWeight(graph, year, name), new PageRankWeight(graph, year, name), 0.5, 0.5);
+                    top = Scoring.computeScoring(graph, year, name, scoring, weightPrW, 0.5, 0.5, k);
+                    Utils.print(top);
+                    GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
+                    sb.append(year + "\t" + k + "\t" + top + "\n");
+                    Utils.writeLog(sb, name);
 
-                // weighted clustering coefficient
-                Weight<MyVertex, MyEdgeDS1> weight = new SimpleWeight(graph, year, "ccoeffw");
-                List<String> topCCoeffW = Scoring.computeScoring(graph, year, "ccoeffw", Scoring.ScoringMeasure.CLUSTERING_COEFFICIENT, weight, 0.9, 0.1, k);
-                Utils.print(topCCoeffW);
-                GraphUtils.writeImage(dot, "plots/ccoeffw", year + "_" + k, topCCoeffW);
-                sbCCoeffW.append(year + "\t" + k + "\t" + topCCoeffW + "\n");
+                    // metric weighted with page rank of the authors and number of occurrences of the keyword, multipled
+                    sb = new StringBuilder();
+                    name = scoring.toString() + "_prw_mul";
+                    top = Scoring.computeScoringMul(graph, year, name, scoring, weightPrW, k);
+                    Utils.print(top);
+                    GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
+                    sb.append(year + "\t" + k + "\t" + top + "\n");
+                    Utils.writeLog(sb, name);
 
-                // clustering coefficient weighted with page rank of the authors
-                Weight<MyVertex, MyEdgeDS1> weightPr = new PageRankWeight(graph, year, "ccoeffpr");
-                List<String> topCCoeffPr = Scoring.computeScoring(graph, year, "ccoeffpr", Scoring.ScoringMeasure.CLUSTERING_COEFFICIENT, weightPr, 0.5, 0.5, k);
-                Utils.print(topCCoeffPr);
-                GraphUtils.writeImage(dot, "plots/ccoeffpr", year + "_" + k, topCCoeffPr);
-                sbCCoeffPr.append(year + "\t" + k + "\t" + topCCoeffPr + "\n");
-*/
-                // clustering coefficient weighted with page rank of the authors and number of occurrences of the pair of keywords
-                Weight weightPrW = Weight.compose(new SimpleWeight(graph, year, "ccoeffprw"), new PageRankWeight(graph, year, "ccoeffprw"), 0.5, 0.5);
-//                List<String> topCCoeffPrW = Scoring.computeScoring(graph, year, "ccoeffprw", Scoring.ScoringMeasure.CLUSTERING_COEFFICIENT, weightPrW, 0.5, 0.5, k);
-//                Utils.print(topCCoeffPrW);
-//                GraphUtils.writeImage(dot, "plots/ccoeffprw", year + "_" + k, topCCoeffPrW);
-//                sbCCoeffPrW.append(year + "\t" + k + "\t" + topCCoeffPrW + "\n");
+                    // metric weighted with page rank of the authors and number of occurrences of the keyword, with different weights
+                    sb = new StringBuilder();
+                        name = scoring.toString() + "_prw_unb";
+                    Weight weightPrWUnb = Weight.compose(new SimpleWeight(graph, year, name), new PageRankWeight(graph, year, name), 0.3, 0.7);
+                    top = Scoring.computeScoring(graph, year, name, scoring, weightPrWUnb, 0.7, 0.3, k);
+                    Utils.print(top);
+                    GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
+                    sb.append(year + "\t" + k + "\t" + top + "\n");
+                    Utils.writeLog(sb, name);
 
-                List<String> topCCoeffPrWMul = Scoring.computeScoringMul(graph, year, "ccoeffprwmul", Scoring.ScoringMeasure.CLUSTERING_COEFFICIENT, weightPrW, k);
-                Utils.print(topCCoeffPrWMul);
-                GraphUtils.writeImage(dot, "plots/ccoeffprwmul", year + "_" + k, topCCoeffPrWMul);
-                sbCCoeffPrWMul.append(year + "\t" + k + "\t" + topCCoeffPrWMul + "\n");
-
-                // clustering coefficient weighted with page rank of the authors and number of occurrences of the pair of keywords (unbalanced)
-                Weight weightPrWUnb = Weight.compose(new SimpleWeight(graph, year, "ccoeffprwunb"), new PageRankWeight(graph, year, "ccoeffprwunb"), 0.3, 0.7);
-//                List<String> topCCoeffPrWUnb = Scoring.computeScoring(graph, year, "ccoeffprwunb", Scoring.ScoringMeasure.CLUSTERING_COEFFICIENT, weightPrWUnb, 0.7, 0.3, k);
-//                Utils.print(topCCoeffPrWUnb);
-//                GraphUtils.writeImage(dot, "plots/ccoeffprwunb", year + "_" + k, topCCoeffPrWUnb);
-//                sbCCoeffPrWUnb.append(year + "\t" + k + "\t" + topCCoeffPrWUnb + "\n");
-
-                List<String> topCCoeffPrWUnbMul = Scoring.computeScoringMul(graph, year, "ccoeffprwunbmul", Scoring.ScoringMeasure.CLUSTERING_COEFFICIENT, weightPrWUnb, k);
-                Utils.print(topCCoeffPrWUnbMul);
-                GraphUtils.writeImage(dot, "plots/ccoeffprwunbmul", year + "_" + k, topCCoeffPrWUnbMul);
-                sbCCoeffPrWUnbMul.append(year + "\t" + k + "\t" + topCCoeffPrWUnbMul + "\n");
-
-/*
-                // weighted closeness centrality
-                Weight<MyVertex, MyEdgeDS1> weightCC = new SimpleWeight(graph, year, "ccw");
-                List<String> topCCW = Scoring.computeScoring(graph, year, "ccw", Scoring.ScoringMeasure.CLOSENESS_CENTRALITY, weightCC, 0.9, 0.1, k);
-                Utils.print(topCCW);
-                GraphUtils.writeImage(dot, "plots/ccw", year + "_" + k, topCCW);
-                sbCCW.append(year + "\t" + k + "\t" + topCCW + "\n");
-
-                // closeness centrality weighted with page rank of the authors
-                Weight<MyVertex, MyEdgeDS1> weightCCPr = new PageRankWeight(graph, year, "ccpr");
-                List<String> topCCPr = Scoring.computeScoring(graph, year, "ccpr", Scoring.ScoringMeasure.CLOSENESS_CENTRALITY, weightCCPr, 0.5, 0.5, k);
-                Utils.print(topCCPr);
-                GraphUtils.writeImage(dot, "plots/ccpr", year + "_" + k, topCCPr);
-                sbCCPr.append(year + "\t" + k + "\t" + topCCPr + "\n");
-
-                // closeness centrality weighted with page rank of the authors and number of occurrences of the pair of keywords
-                Weight weightCCPrW = Weight.compose(new SimpleWeight(graph, year, "ccprw"), new PageRankWeight(graph, year, "ccprw"), 0.5, 0.5);
-                List<String> topCCPrW = Scoring.computeScoring(graph, year, "ccprw", Scoring.ScoringMeasure.CLOSENESS_CENTRALITY, weightCCPrW, 0.5, 0.5, k);
-                Utils.print(topCCPrW);
-                GraphUtils.writeImage(dot, "plots/ccprw", year + "_" + k, topCCPrW);
-                sbCCPrW.append(year + "\t" + k + "\t" + topCCPrW + "\n");
-
-                // closeness centrality weighted with page rank of the authors and number of occurrences of the pair of keywords (unbalanced)
-                Weight weightCCPrWUnb = Weight.compose(new SimpleWeight(graph, year, "ccprwunb"), new PageRankWeight(graph, year, "ccprwunb"), 0.3, 0.7);
-                List<String> topCCPrWUnb = Scoring.computeScoring(graph, year, "ccprwunb", Scoring.ScoringMeasure.CLOSENESS_CENTRALITY, weightCCPrWUnb, 0.7, 0.3, k);
-                Utils.print(topCCPrWUnb);
-                GraphUtils.writeImage(dot, "plots/ccprwunb", year + "_" + k, topCCPrWUnb);
-                sbCCPrWUnb.append(year + "\t" + k + "\t" + topCCPrWUnb + "\n");*/
+                    // metric weighted with page rank of the authors and number of occurrences of the keyword, with different weights, multiplied
+                    sb = new StringBuilder();
+                    name = scoring.toString() + "_prw_unb_mul";
+                    top = Scoring.computeScoringMul(graph, year, name, scoring, weightPrWUnb, k);
+                    Utils.print(top);
+                    GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
+                    sb.append(year + "\t" + k + "\t" + top + "\n");
+                    Utils.writeLog(sb, name);
+                }
             }
         }
-
-//        Utils.writeLog(sbCCoeff,"clust_coeff");
-//        Utils.writeLog(sbBc,"between_centr");
-//        Utils.writeLog(sbCc,"close_centr");
-//        Utils.writeLog(sbAc,"alpha_centr");
-//        Utils.writeLog(sbPr, "page_rank");
-//        Utils.writeLog(sbCCoeffW,"clust_coeff_weighed");
-//        Utils.writeLog(sbCCoeffPr,"clust_coeff_pr");
-//        Utils.writeLog(sbCCoeffPrW,"clust_coeff_pr_weighed");
-//        Utils.writeLog(sbCCoeffPrWUnb,"clust_coeff_pr_weighed_unb");
-        Utils.writeLog(sbCCoeffPrWMul,"clust_coeff_pr_weighed_mul");
-        Utils.writeLog(sbCCoeffPrWUnbMul,"clust_coeff_pr_weighed_unb_mul");
-//        Utils.writeLog(sbCCW,"close_centr_weighed");
-//        Utils.writeLog(sbCCPr,"close_centr_pr");
-//        Utils.writeLog(sbCCPrW,"close_centr_pr_weighed");
-//        Utils.writeLog(sbCCPrWUnb,"close_centr_pr_weighed_unb");
     }
 
     public static void spreadInfluence(String logPath) throws ImportException, IOException, URISyntaxException {

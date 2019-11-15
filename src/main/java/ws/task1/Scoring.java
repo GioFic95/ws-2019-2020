@@ -20,7 +20,12 @@ public class Scoring {
      * Enum used to select which scoring one wants to use for the scoring.
      */
     enum ScoringMeasure {
-        CLUSTERING_COEFFICIENT, BETWEENNESS_CENTRALITY, CLOSENESS_CENTRALITY, ALPHA_CENTRALITY, PAGE_RANK
+        CLUSTERING_COEFFICIENT, BETWEENNESS_CENTRALITY, CLOSENESS_CENTRALITY, ALPHA_CENTRALITY, PAGE_RANK;
+
+        @Override
+        public String toString() {
+            return name().substring(0, 3).toLowerCase();
+        }
     }
 
     /**
@@ -36,7 +41,8 @@ public class Scoring {
      * @throws URISyntaxException todo
      */
     static List<String> computeScoring(
-            Graph<MyVertex, MyEdgeDS1> graph, String year, String name, ScoringMeasure scoring, Weight<MyVertex, MyEdgeDS1> weight, double a, double b, int k)
+            Graph<MyVertex, MyEdgeDS1> graph, String year, String name, ScoringMeasure scoring, Weight<MyVertex,
+            MyEdgeDS1> weight, double a, double b, int k)
             throws IOException, URISyntaxException {
         StringBuilder sb = new StringBuilder(year);
         k = Integer.min(k, graph.vertexSet().size());
@@ -50,9 +56,7 @@ public class Scoring {
                 scores = new HashMap<>(new BetweennessCentrality<>(graph).getScores());
                 break;
             case CLOSENESS_CENTRALITY:
-                Map<MyVertex, Double> map = new HashMap<>(new HarmonicCentrality<>(graph).getScores());
-                final double max = Collections.max(map.values());
-                scores = map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue()/max));
+                scores = new HashMap<>(new HarmonicCentrality<>(graph).getScores());
                 break;
             case ALPHA_CENTRALITY:
                 scores = new HashMap<>(new AlphaCentrality<>(graph).getScores());
@@ -63,25 +67,28 @@ public class Scoring {
             default:
                 throw new IllegalArgumentException("scoring not supported");
         }
-//        Utils.print("scores: " + scores);
         sb.append("\t").append(scores);
-        List<String> topK = new ArrayList<>();
+
+        // Normalize with the max score.
+        final double max1 = Collections.max(scores.values());
+        scores.forEach((myVertex, score) -> scores.put(myVertex, score / max1));
+        sb.append("\t").append(scores);
+
         if (weight != null) {
             Map<?, Double> weights = weight.getScores();
-//            Utils.print("weights: " + weights);
             sb.append("\t").append(weights);
             if (a!=0 || b!=0) {
                 scores.forEach((myVertex, score) -> scores.put(myVertex, (score * a) + (weights.get(myVertex) * b)));
             } else {
                 scores.forEach((myVertex, score) -> scores.put(myVertex, score * weights.get(myVertex)));
-                final double max = Collections.max(scores.values());
-                scores.forEach((myVertex, score) -> scores.put(myVertex, score / max));
             }
-//            Utils.print("weighted scores: " + scores);
             sb.append("\t").append(scores);
         }
         sb.append("\n");
+
         Utils.writeLog(sb, "scoring_" + name, false);
+
+        List<String> topK = new ArrayList<>();
         for (int i=0; i<k; i++) {
             MyVertex topVertex = Collections.max(scores.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey();
             scores.remove(topVertex);
