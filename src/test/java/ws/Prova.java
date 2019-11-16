@@ -54,12 +54,16 @@ public class Prova {
 //        Double maxd = Collections.max(mapd.values())/2;
 //        Utils.print(maxd);
 
-        Double res = Double.POSITIVE_INFINITY;
-        assert res >= 0 && res <= 1 : "caso 1";
-        Utils.print(res);
-        Double resneg = Double.NEGATIVE_INFINITY;
-        assert resneg >= 0 && resneg <= 1 : "caso 2";
-        Utils.print(resneg);
+//        Double res = Double.POSITIVE_INFINITY;
+//        assert res >= 0 && res <= 1 : "caso 1";
+//        Utils.print(res);
+//        Double resneg = Double.NEGATIVE_INFINITY;
+//        assert resneg >= 0 && resneg <= 1 : "caso 2";
+//        Utils.print(resneg);
+
+        List<String> dates = Arrays.asList("pag_weighted__2019_11_15__09_53_39.txt", "pag_weighted__2019_11_15__10_11_50.txt", "pag_weighted__2019_11_15__09_57_19.txt");
+        String max = Collections.max(dates, Comparator.naturalOrder());
+        Utils.print(max);
     }
 
 }

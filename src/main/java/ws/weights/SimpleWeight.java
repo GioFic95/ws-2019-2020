@@ -58,13 +58,10 @@ public class SimpleWeight extends Weight<MyVertex, MyEdgeDS1> {
         double max = Collections.max(map.values());
         map = map.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey, entry -> {
-                    double num = entry.getValue(); // entry.getValue() == 0 ? 0 : Math.log(entry.getValue());
-                    double den = max; //Math.log(max);
-                    double res = num/den;
-                    assert res >= 0 && res <= 1 : "id " + entry.getKey().getId() + " " + num + "/" + den + ", max: " + max;
+                    double res = entry.getValue()/max;
+                    assert res >= 0 && res <= 1 : "id " + entry.getKey().getId() + " " + entry.getValue() + "/" + max;
                     return res;
                 }));
-//        Utils.print("SimpleWeight scores: " + map);
         try {
             Utils.writeLog(new StringBuilder(year + "\t" + map + "\n"), "simple_weight_" + name, false);
         } catch (IOException | URISyntaxException e) {

@@ -56,6 +56,6 @@ public class Main {
     public static void main(String... args) throws ExportException, IOException, URISyntaxException, TransformerException, ImportException {
 //        preprocessing();
         Task1.tryMeasures();
-//        Task1.spreadInfluence("logs/close_centr_pr_weighed_unb__2019_11_12__01_16_06.txt");
+        Task1.spreadInfluence("alp_prw");
     }
 }

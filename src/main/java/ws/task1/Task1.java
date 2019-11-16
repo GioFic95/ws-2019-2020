@@ -55,7 +55,9 @@ public class Task1 {
                     Utils.print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
-                    Utils.writeLog(sb, name);
+                    if (i == 2018 && k == 100) {
+                        Utils.writeLog(sb, name);
+                    }
 
                     // metric weighted with SimpleWeight (based on number of papers using that keyword)
                     sb = new StringBuilder();
@@ -65,7 +67,9 @@ public class Task1 {
                     Utils.print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
-                    Utils.writeLog(sb, name);
+                    if (i == 2018 && k == 100) {
+                        Utils.writeLog(sb, name);
+                    }
 
                     // metric weighted with page rank of the authors
                     sb = new StringBuilder();
@@ -75,7 +79,9 @@ public class Task1 {
                     Utils.print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
-                    Utils.writeLog(sb, name);
+                    if (i == 2018 && k == 100) {
+                        Utils.writeLog(sb, name);
+                    }
 
                     // metric weighted with page rank of the authors and number of occurrences of the keyword, with equal weights
                     sb = new StringBuilder();
@@ -85,7 +91,9 @@ public class Task1 {
                     Utils.print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
-                    Utils.writeLog(sb, name);
+                    if (i == 2018 && k == 100) {
+                        Utils.writeLog(sb, name);
+                    }
 
                     // metric weighted with page rank of the authors and number of occurrences of the keyword, multipled
                     sb = new StringBuilder();
@@ -94,7 +102,9 @@ public class Task1 {
                     Utils.print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
-                    Utils.writeLog(sb, name);
+                    if (i == 2018 && k == 100) {
+                        Utils.writeLog(sb, name);
+                    }
 
                     // metric weighted with page rank of the authors and number of occurrences of the keyword, with different weights
                     sb = new StringBuilder();
@@ -104,7 +114,9 @@ public class Task1 {
                     Utils.print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
-                    Utils.writeLog(sb, name);
+                    if (i == 2018 && k == 100) {
+                        Utils.writeLog(sb, name);
+                    }
 
                     // metric weighted with page rank of the authors and number of occurrences of the keyword, with different weights, multiplied
                     sb = new StringBuilder();
@@ -113,13 +125,16 @@ public class Task1 {
                     Utils.print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
-                    Utils.writeLog(sb, name);
+                    if (i == 2018 && k == 100) {
+                        Utils.writeLog(sb, name);
+                    }
                 }
             }
         }
     }
 
-    public static void spreadInfluence(String logPath) throws ImportException, IOException, URISyntaxException {
+    public static void spreadInfluence(String name) throws ImportException, IOException, URISyntaxException {
+        String logPath = "logs/" + Utils.findLastLog(name);
         IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "k", "seeds"}, logPath);
         StringBuilder sb = new StringBuilder();
 

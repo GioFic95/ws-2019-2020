@@ -15,7 +15,10 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A class with general purpose utility functions.
@@ -124,6 +127,18 @@ public class Utils {
                     throw new IllegalStateException("Can't remove " + file.getAbsolutePath());
                 }
             }
+        }
+    }
+
+    public static String findLastLog(String pattern) throws URISyntaxException {
+        URI res = Main.class.getResource("logs").toURI();
+        File folder = new File(res);
+        final File[] files = folder.listFiles((dir, name) -> name.matches( pattern ));
+        if (files != null) {
+            final List<String> names = Arrays.stream(files).map(File::toString).collect(Collectors.toList());
+            return Collections.max(names, Comparator.naturalOrder());
+        } else {
+            return null;
         }
     }
 }

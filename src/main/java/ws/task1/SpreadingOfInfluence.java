@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 /**
  *
@@ -46,11 +47,11 @@ public class SpreadingOfInfluence {
                     .mapToDouble(entry -> entry.getValue() * authors.get(entry.getKey().getValue())).sum();
             probabilities.put(myEdge, prob);
         }
-        // Normalize with the max weight.
-        double max = Collections.max(probabilities.values());
-        probabilities = probabilities.entrySet().stream().collect(Collectors.toMap(
-//                Map.Entry::getKey, entry -> Math.log(entry.getValue())/Math.log(max)));
-                Map.Entry::getKey, entry -> entry.getValue()/max));
+        // Translate to a probability distribution, by dividing by the sum of the computed values
+        // (in this way, the sum will be 1)
+        double sum = probabilities.values().stream().mapToDouble(e -> e).sum();
+        probabilities = probabilities.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue()/sum));
         Utils.print("PropagationProbabilities: " + probabilities);
         return probabilities;
     }

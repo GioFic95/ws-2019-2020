@@ -70,8 +70,8 @@ public class Scoring {
         sb.append("\t").append(scores);
 
         // Normalize with the max score.
-        final double max1 = Collections.max(scores.values());
-        scores.forEach((myVertex, score) -> scores.put(myVertex, score / max1));
+        final double max = Collections.max(scores.values());
+        scores.forEach((myVertex, score) -> scores.put(myVertex, score / max));
         sb.append("\t").append(scores);
 
         if (weight != null) {
