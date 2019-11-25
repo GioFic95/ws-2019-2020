@@ -41,8 +41,11 @@ public class MyEdgeDS1 extends DefaultEdge {
      */
     @Override
     public String toString() {
-        return "(" + getSource() + " : " + getTarget() + " - " + authors + ")";
+        return "(" + getSource() + " : " + getTarget() + ")";
     }
+//    public String toString() {
+//        return "(" + getSource() + " : " + getTarget() + " - " + authors + ")";
+//    }
 
     /**
      * In order to serialize the graph in DOT format, the authors map must be converted into a map attributes.

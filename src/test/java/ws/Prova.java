@@ -61,9 +61,18 @@ public class Prova {
 //        assert resneg >= 0 && resneg <= 1 : "caso 2";
 //        Utils.print(resneg);
 
-        List<String> dates = Arrays.asList("pag_weighted__2019_11_15__09_53_39.txt", "pag_weighted__2019_11_15__10_11_50.txt", "pag_weighted__2019_11_15__09_57_19.txt");
-        String max = Collections.max(dates, Comparator.naturalOrder());
-        Utils.print(max);
-    }
+//        List<String> dates = Arrays.asList("pag_weighted__2019_11_15__09_53_39.txt", "pag_weighted__2019_11_15__10_11_50.txt", "pag_weighted__2019_11_15__09_57_19.txt");
+//        String max = Collections.max(dates, Comparator.naturalOrder());
+//        Utils.print(max);
 
+        Map<String, Integer> map = new HashMap<>();
+        map.put("uno", 1);
+        map.put("due", 2);
+        map.put("tre", 3);
+        Utils.print(map);
+        Map<String, Integer> map2 = new HashMap<>(map);
+        map2.put("due", 22);
+        Utils.print(map2);
+        Utils.print(map);
+    }
 }

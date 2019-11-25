@@ -55,7 +55,7 @@ public class Main {
      */
     public static void main(String... args) throws ExportException, IOException, URISyntaxException, TransformerException, ImportException {
 //        preprocessing();
-        Task1.tryMeasures();
-        Task1.spreadInfluence("alp_prw");
+//        Task1.tryMeasures();
+        Task1.spreadInfluence("alp_prw__.*\\.txt");
     }
 }

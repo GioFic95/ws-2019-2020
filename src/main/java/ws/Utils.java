@@ -109,10 +109,10 @@ public class Utils {
     @Contract("_, _, _ -> new")
     public static File getNewFile(String pathName, String fileName, String ext) throws URISyntaxException {
         URI res = Main.class.getResource(pathName).toURI();
-        print(fileName + " " + new File(res).exists());
+//        print(fileName + " " + new File(res).exists());
 
         String path = res.getPath() + "/" + fileName + "." + ext;
-        print(path);
+//        print(path);
         return new File(path);
     }
 
@@ -120,7 +120,7 @@ public class Utils {
         URI res = Main.class.getResource(pathName).toURI();
         File folder = new File(res);
 
-        final File[] files = folder.listFiles((dir, name) -> name.matches( pattern ));
+        final File[] files = folder.listFiles((dir, name) -> name.matches(pattern));
         if (files != null) {
             for (final File file : files) {
                 if (!file.delete()) {
@@ -133,11 +133,14 @@ public class Utils {
     public static String findLastLog(String pattern) throws URISyntaxException {
         URI res = Main.class.getResource("logs").toURI();
         File folder = new File(res);
-        final File[] files = folder.listFiles((dir, name) -> name.matches( pattern ));
+        final File[] files = folder.listFiles((dir, name) -> name.matches(pattern));
+//        print(files);
         if (files != null) {
-            final List<String> names = Arrays.stream(files).map(File::toString).collect(Collectors.toList());
+            final List<String> names = Arrays.stream(files).map(File::getName).collect(Collectors.toList());
+            print(names);
             return Collections.max(names, Comparator.naturalOrder());
         } else {
+            print("no matching files");
             return null;
         }
     }
