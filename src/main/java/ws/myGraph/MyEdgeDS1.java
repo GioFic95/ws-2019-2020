@@ -75,4 +75,14 @@ public class MyEdgeDS1 extends DefaultEdge {
         }
         return authors;
     }
+
+    @Override
+    public Object getSource() {
+        return super.getSource();
+    }
+
+    @Override
+    public Object getTarget() {
+        return super.getTarget();
+    }
 }

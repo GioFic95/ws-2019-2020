@@ -1,6 +1,7 @@
 package ws;
 
 import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
 import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.graph.SimpleWeightedGraph;
@@ -37,7 +38,10 @@ public class Tests {
 //        Utils.print(prw.getScores());
 
         // test delete files according to pattern
-        Utils.delMatchigFiles("test", "(scoring|simple_weight|page_rank)[a-zA-Z_]*\\.txt");
+//        Utils.delMatchigFiles("test", "(scoring|simple_weight|page_rank)[a-zA-Z_]*\\.txt");
+
+        // test for directed edges from undirected graphs
+        testDirectedEdges();
     }
 
     public static void demoDS1() throws ExportException, IOException, ImportException, URISyntaxException {
@@ -160,5 +164,11 @@ public class Tests {
         graph.setEdgeWeight(e4, 3);
 
         return graph;
+    }
+
+    private static void testDirectedEdges() {
+        Graph<MyVertex, MyEdgeDS1> g = createMyGraphDS1Default();
+        DefaultEdge edge = new DefaultEdge();
+
     }
 }

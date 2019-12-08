@@ -42,7 +42,7 @@ public abstract class Weight<V, E extends DefaultEdge> {
      * @param <E> The type of the edges of the graph.
      * @return A composed weight of the graph.
      */
-    public static <V, E extends DefaultEdge> Weight compose(Weight w1, Weight w2, double a, double b) {
+    public static <V, E extends DefaultEdge> Weight compose(Weight<V,E> w1, Weight<V,E> w2, double a, double b) {
         if (! w1.graph.equals(w2.graph)) {
             throw new IllegalArgumentException("Incompatible weights: they must refer to the same graph");
         }

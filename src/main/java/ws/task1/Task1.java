@@ -11,6 +11,7 @@ import ws.Utils;
 import ws.myGraph.GraphUtils;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
+import ws.myGraph.SimpleDirectedEdge;
 import ws.task1.diffusionModels.IndependentCascade;
 import ws.weights.PageRankWeight;
 import ws.weights.SimpleWeight;
@@ -153,12 +154,7 @@ public class Task1 {
 
             Graph<MyVertex, MyEdgeDS1> graph = GraphUtils.loadDS1Graph(year);
 
-//            Map<String, List<String>> independentCascade =
-//                    new IndependentCascade(graph, seeds, SpreadingOfInfluence.getEdgePropagationProbabilities(graph, year)).propagate();
-//            Utils.print("Independent Cascade: " + independentCascade);
-//            sb.append(independentCascade+"\n");
-
-            Map<MyEdgeDS1, Double> probabilities = DiffusionUtils.getEdgePropagationProbabilities(graph, year);
+            Map<SimpleDirectedEdge, Double> probabilities = DiffusionUtils.getEdgePropagationProbabilities(graph, year);
             IndependentCascade independentCascade = new IndependentCascade(graph, seeds, probabilities);
             Set<String> infected = Collections.emptySet();
             for (int i=0; i<4; i++) {

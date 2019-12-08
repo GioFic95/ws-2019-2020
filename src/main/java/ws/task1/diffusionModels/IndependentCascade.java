@@ -5,6 +5,7 @@ import org.jgrapht.alg.util.NeighborCache;
 import ws.Utils;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
+import ws.myGraph.SimpleDirectedEdge;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -12,10 +13,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class IndependentCascade extends DiffusionModel{
-    private Map<MyEdgeDS1, Double> propagationProbabilities;
+    private Map<SimpleDirectedEdge, Double> propagationProbabilities;
     private NeighborCache<MyVertex, MyEdgeDS1> neighborGraph;
 
-    public IndependentCascade(Graph<MyVertex, MyEdgeDS1> graph, List<String> seeds, Map<MyEdgeDS1, Double> edgeProbabilities) {
+    public IndependentCascade(Graph<MyVertex, MyEdgeDS1> graph, List<String> seeds, Map<SimpleDirectedEdge, Double> edgeProbabilities) {
         super(graph, seeds);
         this.neighborGraph = new NeighborCache<>(graph);
         this.propagationProbabilities = edgeProbabilities;
@@ -82,7 +83,7 @@ public class IndependentCascade extends DiffusionModel{
      */
     public Map<String, List<String>> propagate() {
         NeighborCache<MyVertex, MyEdgeDS1> neighborGraph = new NeighborCache<>(graph);
-        Map<MyEdgeDS1, Double> probabilities = propagationProbabilities;
+        //Map<MyEdgeDS1, Double> probabilities = propagationProbabilities;
         Random ran = new Random();
 
         Set<MyVertex> active = new HashSet<>(); //will store the active nodes
@@ -103,9 +104,9 @@ public class IndependentCascade extends DiffusionModel{
 
                 for (MyVertex follower : neighborGraph.neighborsOf(node)) {
                     Utils.print("edge: " + node + " - " + follower);
-                    MyEdgeDS1 myEdge = graph.getEdge(node, follower);
                     float randnum = ran.nextFloat();
-                    double prob = probabilities.get(myEdge);
+                    SimpleDirectedEdge myEdge = new SimpleDirectedEdge(node, follower);
+                    double prob = propagationProbabilities.get(myEdge);
                     Utils.print("rand: " + randnum + ", prob: " + prob);
                     if (randnum <= prob) {
                         if (!active.contains(follower)) {
