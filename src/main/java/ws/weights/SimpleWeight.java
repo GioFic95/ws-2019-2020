@@ -36,8 +36,7 @@ public class SimpleWeight extends Weight<MyVertex, MyEdgeDS1> {
      * @see MyEdgeDS1#getAuthors() MyEdgeDS1.getAuthors
      * @see MyVertex#getValue() MyVertex.getValue
      */
-    @Override
-    public Map<MyVertex, Double> getScores() {
+    public Map<MyVertex, Double> getScores(boolean normalize) {
         NeighborCache<MyVertex, MyEdgeDS1> neighborGraph = new NeighborCache<>(graph);
         Map<MyVertex, Double> map = new HashMap<>();
         for (MyVertex mv : graph.vertexSet()) {
@@ -54,14 +53,17 @@ public class SimpleWeight extends Weight<MyVertex, MyEdgeDS1> {
             // the incident edges.
             map.put(mv, sum);
         }
-        // Normalize with the max weight.
-        double max = Collections.max(map.values());
-        map = map.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey, entry -> {
-                    double res = entry.getValue()/max;
-                    assert res >= 0 && res <= 1 : "id " + entry.getKey().getId() + " " + entry.getValue() + "/" + max;
-                    return res;
-                }));
+
+        if (normalize) {
+            // Normalize with the max weight.
+            double max = Collections.max(map.values());
+            map = map.entrySet().stream().collect(Collectors.toMap(
+                    Map.Entry::getKey, entry -> {
+                        double res = entry.getValue() / max;
+                        assert res >= 0 && res <= 1 : "id " + entry.getKey().getId() + " " + entry.getValue() + "/" + max;
+                        return res;
+                    }));
+        }
         try {
             Utils.writeLog(new StringBuilder(year + "\t" + map + "\n"), "simple_weight_" + name, false);
         } catch (IOException | URISyntaxException e) {
@@ -71,4 +73,12 @@ public class SimpleWeight extends Weight<MyVertex, MyEdgeDS1> {
         return map;
     }
 
+    /**
+     * Shortcut for the standard way of computing scores, i.e., with normalization.
+     * @return the normalized scores.
+     */
+    @Override
+    public Map<MyVertex, Double> getScores() {
+        return getScores(true);
+    }
 }

@@ -10,6 +10,8 @@ import org.jgrapht.io.ImportException;
 import ws.myGraph.GraphUtils;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
+import ws.myGraph.SimpleDirectedEdge;
+import ws.task1.DiffusionUtils;
 import ws.weights.PageRankWeight;
 
 import java.io.File;
@@ -40,8 +42,8 @@ public class Tests {
         // test delete files according to pattern
 //        Utils.delMatchigFiles("test", "(scoring|simple_weight|page_rank)[a-zA-Z_]*\\.txt");
 
-        // test for directed edges from undirected graphs
-        testDirectedEdges();
+        // test for computing probabilities on directed edges in undirected graphs
+        testDirectedEdgesProbabilities();
     }
 
     public static void demoDS1() throws ExportException, IOException, ImportException, URISyntaxException {
@@ -166,9 +168,14 @@ public class Tests {
         return graph;
     }
 
-    private static void testDirectedEdges() {
-        Graph<MyVertex, MyEdgeDS1> g = createMyGraphDS1Default();
-        DefaultEdge edge = new DefaultEdge();
-
+    private static void testDirectedEdgesProbabilities() throws ImportException, IOException, URISyntaxException {
+        Graph<MyVertex, MyEdgeDS1> graph = GraphUtils.loadDS1Graph("2000");
+        Map<SimpleDirectedEdge, Double> probabilities = DiffusionUtils.getEdgePropagationProbabilities(graph, "2000");
+        MyVertex v1 = new MyVertex("43.80.+p");
+        MyVertex v2 = new MyVertex("lyapunov functional");
+        SimpleDirectedEdge edge1 = new SimpleDirectedEdge(v1, v2);
+        SimpleDirectedEdge edge2 = new SimpleDirectedEdge(v2, v1);
+        Utils.print(probabilities.get(edge1));
+        Utils.print(probabilities.get(edge2));
     }
 }

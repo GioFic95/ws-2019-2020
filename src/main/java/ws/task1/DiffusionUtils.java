@@ -36,10 +36,13 @@ public class DiffusionUtils {
      */
     public static Map<SimpleDirectedEdge, Double> getEdgePropagationProbabilities(Graph<MyVertex, MyEdgeDS1> graph, String year)
             throws ImportException, IOException, URISyntaxException {
-        Map<MyVertex, Double> authorsPR = GraphUtils.authorsPageRank(year);
-        Map<MyVertex, Double> nodesWeights = Weight.compose(
-                new SimpleWeight(graph, year, "PropagationProbabilities"),
-                new PageRankWeight(graph, year, "PropagationProbabilities"), 0.5, 0.5).getScores();
+        StringBuilder sb = new StringBuilder();
+
+//        Map<MyVertex, Double> authorsPR = GraphUtils.authorsPageRank(year);
+//        Map<MyVertex, Double> nodesWeights = Weight.compose(
+//                new SimpleWeight(graph, year, "PropagationProbabilities"),
+//                new PageRankWeight(graph, year, "PropagationProbabilities"), 0.5, 0.5).getScores();
+        Map<MyVertex, Double> nodesWeights = new SimpleWeight(graph, year, "PropagationProbabilities").getScores(false);
         Map<SimpleDirectedEdge, Double> probabilities = new HashMap<>();
 
         // To each edge of the the graph from DS1 I assign a weight w, s.t. w = sum_{a in A}(pr_a * n_a),
@@ -49,21 +52,29 @@ public class DiffusionUtils {
         for (MyEdgeDS1 myEdge : graph.edgeSet()) {
             MyVertex source = (MyVertex) myEdge.getSource();
             MyVertex target = (MyVertex) myEdge.getTarget();
-            Map<String, Integer> authors = myEdge.getAuthors();
+//            Map<String, Integer> authors = myEdge.getAuthors();
 
-            double num = authorsPR.entrySet().stream()
-                    .filter(entry -> authors.containsKey(entry.getKey().getValue()))
-                    .mapToDouble(entry -> entry.getValue() * authors.get(entry.getKey().getValue()))
-                    .sum();
+            double num = myEdge.getAuthors().values().stream().reduce(0, Integer::sum).doubleValue();
+
+//            double num = authorsPR.entrySet().stream()
+//                    .filter(entry -> authors.containsKey(entry.getKey().getValue()))
+//                    .mapToDouble(entry -> entry.getValue() * authors.get(entry.getKey().getValue()))
+//                    .sum();
             double denSource = nodesWeights.get(source);
             double denTarget = nodesWeights.get(target);
             probabilities.put(new SimpleDirectedEdge(source, target), num/denSource);
             probabilities.put(new SimpleDirectedEdge(target, source), num/denTarget);
+
+            Utils.print("num: " + num + ", denSource: " + denSource + ", denTarget: " + denTarget);
+            sb.append("num: ").append(num).append(", denSource: ").append(denSource).append(", denTarget: ")
+                    .append(denTarget).append(", ratioSource: ").append(num/denSource).append(", ratioTarget: ")
+                    .append(num/denTarget).append("\n");
         }
         double max = Collections.max(probabilities.values());
         probabilities = probabilities.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue()/max));
         Utils.print("PropagationProbabilities: " + probabilities);
+        Utils.writeLog(sb, "PropagationProbabilities_" + year);
         return probabilities;
     }
 

@@ -38,11 +38,11 @@ public class PageRankWeight extends Weight<MyVertex, MyEdgeDS1> {
      * Uses {@link ws.myGraph.GraphUtils#authorsPageRank(String)} to compute the {@link PageRank} of the authors that
      * appear on the edges of this graph, and, based on this score, produces the weighing of the graph, assigning to
      * each node the normalized sum of the scores of the authors that appears on the edges incident on that node.
+     * @param normalize If the results have to be normalized.
      * @return A weighting of the graph based on {@link PageRank}.
      * @see MyEdgeDS1#getAuthors() MyEdgeDS1.getAuthors
      */
-    @Override
-    public Map<MyVertex, Double> getScores() {
+    public Map<MyVertex, Double> getScores(boolean normalize) {
         try {
             Map<MyVertex, Double> authorsPR = authorsPageRank(year);  // Compute the page rank on the corresponding graph in DS2.
             NeighborCache<MyVertex, MyEdgeDS1> neighborGraph = new NeighborCache<>(graph);
@@ -67,14 +67,16 @@ public class PageRankWeight extends Weight<MyVertex, MyEdgeDS1> {
             }
             Utils.print("partial pageranks" + map);
 
-            // Normalize with the max weight.
-            double max = Collections.max(map.values());
-            map = map.entrySet().stream().collect(Collectors.toMap(
-                    Map.Entry::getKey, entry -> {
-                        double res = entry.getValue()/max;
-                        assert res >= 0 && res <= 1 : "id " + entry.getKey().getId() + " " + entry.getValue() + "/" + max;
-                        return res;
-                    }));
+            if (normalize) {
+                // Normalize with the max weight.
+                double max = Collections.max(map.values());
+                map = map.entrySet().stream().collect(Collectors.toMap(
+                        Map.Entry::getKey, entry -> {
+                            double res = entry.getValue() / max;
+                            assert res >= 0 && res <= 1 : "id " + entry.getKey().getId() + " " + entry.getValue() + "/" + max;
+                            return res;
+                        }));
+            }
             Utils.writeLog(new StringBuilder(year + "\t" + map + "\n"), "page_rank_" + name, false);
             return map;
         } catch (ImportException | IOException | URISyntaxException e) {
@@ -83,4 +85,12 @@ public class PageRankWeight extends Weight<MyVertex, MyEdgeDS1> {
         }
     }
 
+    /**
+     * Shortcut for the standard way of computing scores, i.e., with normalization.
+     * @return the normalized scores.
+     */
+    @Override
+    public Map<MyVertex, Double> getScores() {
+        return getScores(true);
+    }
 }

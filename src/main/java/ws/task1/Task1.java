@@ -157,7 +157,8 @@ public class Task1 {
             Map<SimpleDirectedEdge, Double> probabilities = DiffusionUtils.getEdgePropagationProbabilities(graph, year);
             IndependentCascade independentCascade = new IndependentCascade(graph, seeds, probabilities);
             Set<String> infected = Collections.emptySet();
-            for (int i=0; i<4; i++) {
+            for (int i=0; i<6; i++) {
+                Utils.print("iteration " + i);
                 infected = DiffusionUtils.allInfected(infected, independentCascade.iteration());
                 Utils.print(infected);
                 sb.append(i).append("\t").append(infected).append("\n");
