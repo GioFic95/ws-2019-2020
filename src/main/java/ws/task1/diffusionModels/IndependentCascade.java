@@ -1,5 +1,6 @@
 package ws.task1.diffusionModels;
 
+import com.google.gson.Gson;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.util.NeighborCache;
 import ws.Utils;
@@ -15,11 +16,16 @@ import java.util.stream.Collectors;
 public class IndependentCascade extends DiffusionModel{
     private Map<SimpleDirectedEdge, Double> propagationProbabilities;
     private NeighborCache<MyVertex, MyEdgeDS1> neighborGraph;
+    private String year;
+    private String name;
 
-    public IndependentCascade(Graph<MyVertex, MyEdgeDS1> graph, List<String> seeds, Map<SimpleDirectedEdge, Double> edgeProbabilities) {
+    public IndependentCascade(String name, String year, Graph<MyVertex, MyEdgeDS1> graph,
+                              List<String> seeds, Map<SimpleDirectedEdge, Double> edgeProbabilities) {
         super(graph, seeds);
         this.neighborGraph = new NeighborCache<>(graph);
         this.propagationProbabilities = edgeProbabilities;
+        this.year = year;
+        this.name = name;
     }
 
     /**
@@ -30,6 +36,16 @@ public class IndependentCascade extends DiffusionModel{
     @Override
     public Set<String> iteration() {
         Map<MyVertex, NodeStatus> currentStatuses = new HashMap<>(statuses);
+
+        Map<MyVertex, Set<MyVertex>> infectedNodes = currentStatuses.entrySet().stream()
+                .filter(entry -> entry.getValue() == NodeStatus.INFECTED)
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> new HashSet<>()));
+
+        currentStatuses.forEach((k, v) -> {
+            if (v == NodeStatus.INFECTED) {
+                infectedNodes.put(k, new HashSet<>());
+            }
+        });
 
         if (currentIteration == 0) {
             currentIteration ++;
@@ -46,19 +62,21 @@ public class IndependentCascade extends DiffusionModel{
                             if (currentStatuses.get(v2) == NodeStatus.SUSCEPTIBLE) {
                                 Double threshold = propagationProbabilities.get(new SimpleDirectedEdge(v1, v2));
                                 Double coin = new Random().nextDouble();
-                                StringBuilder sb = new StringBuilder()
+                                StringBuilder sb_coins = new StringBuilder()
                                         .append(v1.getId()).append(" - ").append(v2.getId()).append("\t")
                                         .append("coin\t").append(coin)
                                         .append("\tvs threshold\t").append(threshold)
                                         .append("\n");
                                 try {
-                                    Utils.writeLog(sb, "coins", false);
+                                    Utils.writeLog(sb_coins, "coins", false);
                                 } catch (IOException | URISyntaxException e) {
                                     System.err.println("couldn't write coins log");
                                     e.printStackTrace();
                                 }
-                                if (coin <= threshold) {
+                                if (coin <= threshold*2) {
                                     currentStatuses.put(v2, NodeStatus.INFECTED);
+                                    infectedNodes.get(v1).add(v2);
+//                                    Utils.print(infectedNodes.get(v1));
                                 }
                             }
                         }
@@ -66,6 +84,19 @@ public class IndependentCascade extends DiffusionModel{
                     currentStatuses.put(v1, NodeStatus.REMOVED);
                 }
             }
+
+            // write result log
+            Utils.print("infectedNodes: " + infectedNodes);
+            String jsonInfectedNodes = new Gson().toJson(infectedNodes);
+            StringBuilder sb_iterations = new StringBuilder()
+                    .append(year).append(",").append(currentIteration).append(",").append(jsonInfectedNodes).append("\n");
+            try {
+                Utils.writeLog(sb_iterations, name, false);
+            } catch (IOException | URISyntaxException e) {
+                System.err.println("couldn't write independent cascade iterations log");
+                e.printStackTrace();
+            }
+
             statuses = currentStatuses;
             currentIteration ++;
             return statuses.entrySet().stream()

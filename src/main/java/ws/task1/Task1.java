@@ -20,6 +20,8 @@ import ws.weights.Weight;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
@@ -142,6 +144,18 @@ public class Task1 {
         IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "k", "seeds"}, logPath);
         StringBuilder sb = new StringBuilder();
 
+        // Prepare csv log file with the header
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd__HH_mm_ss");
+        String name = "ic_iterations__" + LocalDateTime.now().format(formatter);
+        StringBuilder sb_iterations = new StringBuilder()
+                .append("year").append(",").append("currentIteration").append(",").append("infectedNodes").append("\n");
+        try {
+            Utils.writeLog(sb_iterations, name, false);
+        } catch (IOException | URISyntaxException e) {
+            System.err.println("couldn't write independent cascade iterations log");
+            e.printStackTrace();
+        }
+
         for (Record row : ir) {
             String year = row.getString("year");
             List<String> seeds = new ArrayList<>();
@@ -153,15 +167,17 @@ public class Task1 {
             Utils.print("\nyear: " + year + ", seeds: " + seeds.size() + " - " + seeds);
 
             Graph<MyVertex, MyEdgeDS1> graph = GraphUtils.loadDS1Graph(year);
-
             Map<SimpleDirectedEdge, Double> probabilities = DiffusionUtils.getEdgePropagationProbabilities(graph, year);
-            IndependentCascade independentCascade = new IndependentCascade(graph, seeds, probabilities);
+            IndependentCascade independentCascade = new IndependentCascade(name, year, graph, seeds, probabilities);
             Set<String> infected = Collections.emptySet();
-            for (int i=0; i<6; i++) {
-                Utils.print("iteration " + i);
-                infected = DiffusionUtils.allInfected(infected, independentCascade.iteration());
+            while (true) {
+                Set<String> newInfected = independentCascade.iteration();
+                infected = DiffusionUtils.allInfected(infected, newInfected);
                 Utils.print(infected);
-                sb.append(i).append("\t").append(infected).append("\n");
+                sb.append(infected).append("\n");
+                if (newInfected.isEmpty()) {
+                    break;
+                }
             }
             sb.append("\n");
         }

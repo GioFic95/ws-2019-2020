@@ -6,6 +6,7 @@ import ws.myGraph.MyVertex;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.function.BiFunction;
 
 public class Prova {
     public static void main(String... args) throws URISyntaxException, IOException {
@@ -74,5 +75,17 @@ public class Prova {
         map2.put("due", 22);
         Utils.print(map2);
         Utils.print(map);
+
+        Utils.print(map.putIfAbsent("quattro", 4));
+        Utils.print(map.get("quattro"));
+        Utils.print(map.putIfAbsent("tre", 4));
+
+        Utils.print("compute " + map.compute("quattro", (s, integer) -> {
+            Utils.print("s " + s);
+            Utils.print("int " + integer);
+            if (integer != null)
+                return integer+1;
+            else return 1;
+        }));
     }
 }
