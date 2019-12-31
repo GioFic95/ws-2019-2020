@@ -1,6 +1,7 @@
 package ws.task1.diffusionModels;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.util.NeighborCache;
 import ws.Utils;
@@ -9,6 +10,7 @@ import ws.myGraph.MyVertex;
 import ws.myGraph.SimpleDirectedEdge;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -87,9 +89,10 @@ public class IndependentCascade extends DiffusionModel{
 
             // write result log
             Utils.print("infectedNodes: " + infectedNodes);
-            String jsonInfectedNodes = new Gson().toJson(infectedNodes);
+            Type type = new TypeToken<Map<MyVertex, Set<MyVertex>>>(){}.getType();
+            String jsonInfectedNodes = MyVertex.getGson().toJson(infectedNodes, type);
             StringBuilder sb_iterations = new StringBuilder()
-                    .append(year).append(",").append(currentIteration).append(",").append(jsonInfectedNodes).append("\n");
+                    .append(year).append("\t").append(currentIteration).append("\t").append(jsonInfectedNodes).append("\n");
             try {
                 Utils.writeLog(sb_iterations, name, false);
             } catch (IOException | URISyntaxException e) {

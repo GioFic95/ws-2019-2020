@@ -1,12 +1,18 @@
 package ws;
 
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import ws.Utils;
 import ws.myGraph.MyVertex;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Prova {
     public static void main(String... args) throws URISyntaxException, IOException {
@@ -67,9 +73,9 @@ public class Prova {
 //        Utils.print(max);
 
         Map<String, Integer> map = new HashMap<>();
-        map.put("uno", 1);
-        map.put("due", 2);
-        map.put("tre", 3);
+        map.put("uno1", 1);
+        map.put("due22", 2);
+        map.put("tre333", 3);
         Utils.print(map);
         Map<String, Integer> map2 = new HashMap<>(map);
         map2.put("due", 22);
@@ -87,5 +93,16 @@ public class Prova {
                 return integer+1;
             else return 1;
         }));
+
+        Utils.print(map);
+        Map<Integer, String> map3 = map.entrySet().stream().collect(Collectors.toMap(
+                stringIntegerEntry -> stringIntegerEntry.getKey().length(),
+                stringIntegerEntry -> String.valueOf(stringIntegerEntry.getValue())));
+        Utils.print(map3);
+        String s = new Gson().toJson(map3);
+        Utils.print(s);
+        Type type = new TypeToken<Map<Integer, String>>(){}.getType();
+        Map<Integer, String> obj = new Gson().fromJson(s, type);
+        Utils.print(obj);
     }
 }

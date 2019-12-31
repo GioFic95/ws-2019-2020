@@ -1,5 +1,7 @@
 package ws;
 
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -16,11 +18,9 @@ import ws.weights.PageRankWeight;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static ws.myGraph.GraphUtils.*;
 
@@ -43,7 +43,10 @@ public class Tests {
 //        Utils.delMatchigFiles("test", "(scoring|simple_weight|page_rank)[a-zA-Z_]*\\.txt");
 
         // test for computing probabilities on directed edges in undirected graphs
-        testDirectedEdgesProbabilities();
+//        testDirectedEdgesProbabilities();
+
+        // test the functioning of the serialization and deserialization of maps containing MyVertex objects
+        testMyVertexSerialization();
     }
 
     public static void demoDS1() throws ExportException, IOException, ImportException, URISyntaxException {
@@ -177,5 +180,79 @@ public class Tests {
         SimpleDirectedEdge edge2 = new SimpleDirectedEdge(v2, v1);
         Utils.print(probabilities.get(edge1));
         Utils.print(probabilities.get(edge2));
+    }
+
+    private static void testMyVertexSerialization() {
+        Map<String, Set<String>> map4 = new HashMap<>();
+        Set<String> s1 = new HashSet<>();
+        s1.add("1a");
+        s1.add("1b");
+        Set<String> s2 = new HashSet<>();
+        s2.add("2a");
+        s2.add("2b");
+        s2.add("2c");
+        map4.put("uno", s1);
+        map4.put("due", s2);
+        Utils.print(map4);
+        String json = new Gson().toJson(map4);
+        Utils.print(json);
+        Type type = new TypeToken<Map<String, Set<String>>>(){}.getType();
+        Map<Integer, String> obj = new Gson().fromJson(json, type);
+        Utils.print(obj);
+
+        Type type2 = new TypeToken<Map<MyVertex, String>>(){}.getType();
+        Type type3 = new TypeToken<Map<MyVertex, Set<MyVertex>>>(){}.getType();
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(MyVertex.class, new MyVertex.MyVertexDeserializer())
+                .registerTypeAdapter(MyVertex.class, new MyVertex.MyVertexSerializer())
+                .registerTypeAdapter(type2, new MyMapOfMyVertexToStringSerializer())
+                .registerTypeAdapter(type3, new MyVertex.MyMapOfMyVertexToMyVertexesSerializer())
+                .create();
+
+        Utils.print("test 1");
+        String json1 = gson.toJson(new MyVertex("cinque"));
+        Utils.print(json1);
+        MyVertex obj1 = gson.fromJson(json1, MyVertex.class);
+        Utils.print(obj1);
+
+        Utils.print("test 2");
+        Map<MyVertex, String> map6 = new HashMap<>();
+        map6.put(new MyVertex("uno"), "1");
+        map6.put(new MyVertex("due"), "2");
+        Utils.print(map6);
+        String json2 = gson.toJson(map6, type2);
+        Utils.print(json2);
+        Map<Integer, String> obj2 = gson.fromJson(json2, type2);
+        Utils.print(obj2);
+
+        Utils.print("test 3");
+        Map<MyVertex, Set<MyVertex>> map5 = new HashMap<>();
+        Set<MyVertex> vs1 = new HashSet<>();
+        vs1.add(new MyVertex("val1a"));
+        vs1.add(new MyVertex("val1b"));
+        Set<MyVertex> vs2 = new HashSet<>();
+        vs2.add(new MyVertex("val2a"));
+        vs2.add(new MyVertex("val2b"));
+        vs2.add(new MyVertex("val2c"));
+        map5.put(new MyVertex("uno"), vs1);
+        map5.put(new MyVertex("due"), vs2);
+        Utils.print(map5);
+        String json3 = gson.toJson(map5, type3);
+        Utils.print(json3);
+        Map<MyVertex, Set<MyVertex>> obj3 = gson.fromJson(json3, type3);
+        Utils.print(obj3);
+    }
+
+    private static class MyMapOfMyVertexToStringSerializer implements JsonSerializer<Map<MyVertex, String>> {
+        @Override
+        public JsonElement serialize(Map<MyVertex, String> myVertexStringMap, Type type, JsonSerializationContext jsonSerializationContext) {
+            Utils.print("MyMapOfMyVertexToStringSerializer " + myVertexStringMap);
+            JsonObject jo = new JsonObject();
+            myVertexStringMap.forEach((k, v) -> {
+                JsonElement je = new MyVertex.MyVertexSerializer().serialize(k, type, jsonSerializationContext);
+                jo.add(je.getAsString(), new JsonPrimitive(v));
+            });
+            return jo;
+        }
     }
 }

@@ -1,5 +1,7 @@
 package ws.task1;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.univocity.parsers.common.IterableResult;
 import com.univocity.parsers.common.ParsingContext;
 import com.univocity.parsers.common.record.Record;
@@ -19,10 +21,14 @@ import ws.weights.Weight;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -148,7 +154,7 @@ public class Task1 {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd__HH_mm_ss");
         String name = "ic_iterations__" + LocalDateTime.now().format(formatter);
         StringBuilder sb_iterations = new StringBuilder()
-                .append("year").append(",").append("currentIteration").append(",").append("infectedNodes").append("\n");
+                .append("year").append("\t").append("currentIteration").append("\t").append("infectedNodes").append("\n");
         try {
             Utils.writeLog(sb_iterations, name, false);
         } catch (IOException | URISyntaxException e) {
@@ -182,5 +188,66 @@ public class Task1 {
             sb.append("\n");
         }
         Utils.writeLog(sb, "independent_cascade");
+    }
+
+    public static void drawSpreadInfluence(String pattern) throws ImportException, IOException, URISyntaxException {
+        String logPath = "logs/" + Utils.findLastLog(pattern);
+        Utils.print("spread influence path: " + logPath);
+        IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "currentIteration", "infectedNodes"}, logPath);
+        Map<String, Set<String>> infectedNodesIds = new HashMap<>();
+        int seedNum = 0;
+        String prevYear = "";
+
+        for (Record row : ir) {
+            Integer iteration;
+            try {
+                iteration = row.getInt("currentIteration");
+            } catch (NumberFormatException ex) {
+                Utils.print(row);
+                continue;
+            }
+            String year = row.getString("year");
+            String infectedNodesJson = row.getString("infectedNodes");
+            Type type = new TypeToken<Map<MyVertex, Set<MyVertex>>>(){}.getType();
+            Map<MyVertex, Set<MyVertex>> infectedNodes = MyVertex.getGson().fromJson(infectedNodesJson, type);
+
+            if (iteration == 1) {   // new cascade
+                // if the map of node names isn't empty (this isn't the first cascade), draw the graph relative
+                // to the previous cascade, that is terminated, before starting the new one
+                if (! infectedNodesIds.isEmpty()) {
+                    File file = Utils.getNewFile("graphs/ds1", prevYear, "dot");
+                    String name = prevYear + "_" + seedNum;
+                    GraphUtils.writeImage(file, "plots/ic", name, infectedNodesIds);
+                    Utils.print("writing graph " + name);
+                }
+                prevYear = year;
+
+                // begin analysing the new cascade
+                seedNum = infectedNodes.size();
+
+                infectedNodesIds = infectedNodes.entrySet().stream().collect(Collectors.toMap(
+                        myVertexSetEntry -> myVertexSetEntry.getKey().getId(),
+                        myVertexSetEntry -> myVertexSetEntry.getValue().stream().map(MyVertex::getId).collect(Collectors.toSet())
+                ));
+
+            } else {   // old cascade
+                // add current infected nodes to the previous ones
+                for (Map.Entry<MyVertex, Set<MyVertex>> entry : infectedNodes.entrySet()) {
+                    String newSeed = entry.getKey().getId();
+                    Set<String> newInfectedNeighbors = entry.getValue().stream().map(MyVertex::getId).collect(Collectors.toSet());
+
+                    infectedNodesIds.forEach((seedId, infectedNeighborsIds) -> {
+                        if (infectedNeighborsIds.contains(newSeed)) {
+                            infectedNeighborsIds.addAll(newInfectedNeighbors);
+                        }
+                    });
+                }
+            }
+        }
+        // Write the last cascade
+        File file = Utils.getNewFile("graphs/ds1", prevYear, "dot");
+        String name = prevYear + "_" + seedNum;
+        GraphUtils.writeImage(file, "plots/ic", name, infectedNodesIds);
+        Utils.print("writing graph " + name);
     }
 }

@@ -5,10 +5,13 @@ import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.util.mxCellRenderer;
 import com.mxgraph.util.mxConstants;
 import guru.nidi.graphviz.attribute.Color;
+import guru.nidi.graphviz.attribute.Shape;
 import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
+import guru.nidi.graphviz.model.MutableNode;
+import guru.nidi.graphviz.model.Node;
 import guru.nidi.graphviz.parse.Parser;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.scoring.PageRank;
@@ -28,10 +31,8 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * A class with utility functions for reading, storing ad plotting graphs.<br>
@@ -183,6 +184,38 @@ public class GraphUtils {
 
     /**
      * Creates and stores a plot of the graph written into the given DOT file, the given nodes are colored.
+     * It uses {@link Graphviz} to read the graph and produce the plot.
+     * @param dot   The DOT file containing the serialized graph.
+     * @param path  The path where to save the produced image.
+     * @param name  The name to give to the produced image.
+     * @param nodes The keys that identify the nodes to be colored in the output plot.
+     * @throws IOException if can't read the input file.
+     * @throws URISyntaxException if raised by {@link Utils#getNewFile(String, String, String)}).
+     */
+    public static void writeImage(File dot, String path, String name, Map<String, Set<String>> nodes) throws IOException, URISyntaxException {
+        MutableGraph g = Parser.read(dot);
+        g.nodes().forEach(node -> {
+            for (Map.Entry<String, Set<String>> entry : nodes.entrySet()) {
+                int red = ThreadLocalRandom.current().nextInt(50, 156);
+                int green = ThreadLocalRandom.current().nextInt(50, 156);
+                int blue = ThreadLocalRandom.current().nextInt(50, 156);
+                Color c = Color.rgb(red, green, blue);
+
+                if (entry.getKey().equals(node.name().toString())) {
+                    node.add(c, Style.FILLED, Shape.RECTANGLE);
+                } else if (entry.getValue().contains(node.name().toString())) {
+                    node.add(c, Style.FILLED);
+                }
+            }
+        });
+
+        File imgFile = Utils.getNewFile(path, name, "svg");
+        Utils.print(imgFile.getParentFile().exists());
+        Graphviz.fromGraph(g).width(700).render(Format.SVG).toFile(imgFile);
+    }
+
+    /**
+     * Creates and stores a plot of the given graph.
      * It uses {@link JGraphXAdapter} and {@link mxCellRenderer} to read the graph and produce the plot.
      * @param g     The input graph.
      * @param path  The path where to save the produced image.

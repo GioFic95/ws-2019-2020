@@ -1,12 +1,17 @@
 package ws.myGraph;
 
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import org.jgrapht.io.Attribute;
 import org.jgrapht.io.DefaultAttribute;
 import org.jgrapht.util.SupplierUtil;
+import ws.Utils;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -105,5 +110,86 @@ public class MyVertex {
     @Override
     public int hashCode() {
         return Objects.hash(value);
+    }
+
+    /**
+     * todo
+     * @return
+     */
+    public static Gson getGson() {
+        Type type = new TypeToken<Map<MyVertex, Set<MyVertex>>>(){}.getType();
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(MyVertex.class, new MyVertex.MyVertexDeserializer())
+                .registerTypeAdapter(MyVertex.class, new MyVertex.MyVertexSerializer())
+                .registerTypeAdapter(type, new MyVertex.MyMapOfMyVertexToMyVertexesSerializer())
+                .create();
+        return gson;
+    }
+
+    /**
+     * todo
+     */
+    public static class MyVertexDeserializer implements JsonDeserializer<MyVertex> {
+
+        /**
+         *
+         * @param json
+         * @param typeOfT
+         * @param context
+         * @return
+         * @throws JsonParseException
+         */
+        @Override
+        public MyVertex deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
+            String jsonVertex = json.getAsString();
+            String id = jsonVertex.split("___")[0];
+            String value = jsonVertex.split("___")[1];
+            return new MyVertex(id, value);
+        }
+    }
+
+    public static class MyVertexSerializer implements JsonSerializer<MyVertex> {
+
+        /**
+         *
+         * @param myVertex
+         * @param type
+         * @param jsonSerializationContext
+         * @return
+         */
+        @Override
+        public JsonElement serialize(MyVertex myVertex, Type type, JsonSerializationContext jsonSerializationContext) {
+            return new JsonPrimitive(myVertex.getId() + "___" + myVertex.getValue());
+        }
+    }
+
+    /**
+     *
+     */
+    public static class MyMapOfMyVertexToMyVertexesSerializer implements JsonSerializer<Map<MyVertex, Set<MyVertex>>> {
+
+        /**
+         *
+         * @param myVertexSetMap
+         * @param type
+         * @param jsonSerializationContext
+         * @return
+         */
+        @Override
+        public JsonElement serialize(Map<MyVertex, Set<MyVertex>> myVertexSetMap, Type type, JsonSerializationContext jsonSerializationContext) {
+            Utils.print("MyMapOfMyVertexToMyVertexesSerializer " + myVertexSetMap);
+            JsonObject jo = new JsonObject();
+            myVertexSetMap.forEach((k, v) -> {
+                JsonElement jek = new MyVertex.MyVertexSerializer().serialize(k, type, jsonSerializationContext);
+                JsonArray ja = new JsonArray();
+                v.forEach(myVertex -> {
+                    JsonElement jev = new MyVertex.MyVertexSerializer().serialize(myVertex, type, jsonSerializationContext);
+                    ja.add(jev);
+                });
+                jo.add(jek.getAsString(), ja);
+            });
+            return jo;
+        }
     }
 }
