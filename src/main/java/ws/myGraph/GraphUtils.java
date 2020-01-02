@@ -33,6 +33,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * A class with utility functions for reading, storing ad plotting graphs.<br>
@@ -194,19 +196,30 @@ public class GraphUtils {
      */
     public static void writeImage(File dot, String path, String name, Map<String, Set<String>> nodes) throws IOException, URISyntaxException {
         MutableGraph g = Parser.read(dot);
-        g.nodes().forEach(node -> {
-            for (Map.Entry<String, Set<String>> entry : nodes.entrySet()) {
-                int red = ThreadLocalRandom.current().nextInt(50, 156);
-                int green = ThreadLocalRandom.current().nextInt(50, 156);
-                int blue = ThreadLocalRandom.current().nextInt(50, 156);
-                Color c = Color.rgb(red, green, blue);
+        Map<String, MutableNode> gNodes = g.nodes().stream().collect(Collectors.toMap(
+                entry -> entry.name().toString(), entry -> entry));
 
-                if (entry.getKey().equals(node.name().toString())) {
-                    node.add(c, Style.FILLED, Shape.RECTANGLE);
-                } else if (entry.getValue().contains(node.name().toString())) {
-                    node.add(c, Style.FILLED);
-                }
-            }
+        nodes.forEach((seed, infected) -> {
+            int red = ThreadLocalRandom.current().nextInt(50, 156);
+            int green = ThreadLocalRandom.current().nextInt(50, 156);
+            int blue = ThreadLocalRandom.current().nextInt(50, 156);
+            Color c = Color.rgb(red, green, blue);
+            if (name.contains("2018_10")) // todo debug
+                Utils.print("entry: " + seed + "-" + infected);
+
+            // make the current seed node colored and rectangular
+            MutableNode gSeed = gNodes.get(seed);
+            gSeed.add(c, Style.FILLED, Shape.RECTANGLE);
+            if (name.contains("2018_10")) // todo debug
+                Utils.print("seed: " + gSeed);
+
+            // make the nodes infected by the current seed colored with the same color
+            infected.forEach(infNode -> {
+                MutableNode gInfNode = gNodes.get(infNode);
+                gInfNode.add(c, Style.FILLED);
+                if (name.contains("2018_10")) // todo debug
+                    Utils.print("infected: " + gInfNode);
+            });
         });
 
         File imgFile = Utils.getNewFile(path, name, "svg");

@@ -197,6 +197,9 @@ public class Task1 {
         Map<String, Set<String>> infectedNodesIds = new HashMap<>();
         int seedNum = 0;
         String prevYear = "";
+        StringBuilder sb = new StringBuilder()
+                .append("year").append("\t").append("numSeeds").append("\t").append("infectedNodes").append("\n");
+
 
         for (Record row : ir) {
             Integer iteration;
@@ -212,17 +215,20 @@ public class Task1 {
             Map<MyVertex, Set<MyVertex>> infectedNodes = MyVertex.getGson().fromJson(infectedNodesJson, type);
 
             if (iteration == 1) {   // new cascade
-                // if the map of node names isn't empty (this isn't the first cascade), draw the graph relative
+                // If the map of node names isn't empty (this isn't the first cascade), draw the graph relative
                 // to the previous cascade, that is terminated, before starting the new one
                 if (! infectedNodesIds.isEmpty()) {
                     File file = Utils.getNewFile("graphs/ds1", prevYear, "dot");
                     String name = prevYear + "_" + seedNum;
                     GraphUtils.writeImage(file, "plots/ic", name, infectedNodesIds);
                     Utils.print("writing graph " + name);
+
+                    // Add the previous cascade results to the log
+                    sb.append(prevYear).append("\t").append(seedNum).append("\t").append(infectedNodesIds).append("\n");
                 }
-                prevYear = year;
 
                 // begin analysing the new cascade
+                prevYear = year;
                 seedNum = infectedNodes.size();
 
                 infectedNodesIds = infectedNodes.entrySet().stream().collect(Collectors.toMap(
@@ -244,10 +250,14 @@ public class Task1 {
                 }
             }
         }
-        // Write the last cascade
+        // Write the last cascade plot and add the relative log
         File file = Utils.getNewFile("graphs/ds1", prevYear, "dot");
         String name = prevYear + "_" + seedNum;
         GraphUtils.writeImage(file, "plots/ic", name, infectedNodesIds);
         Utils.print("writing graph " + name);
+        sb.append(prevYear).append("\t").append(seedNum).append("\t").append(infectedNodesIds).append("\n");
+
+        // Write the independent cascade results log
+        Utils.writeLog(sb, "ic_results");
     }
 }
