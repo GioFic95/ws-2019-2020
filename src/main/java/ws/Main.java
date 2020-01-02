@@ -58,7 +58,7 @@ public class Main {
 //        Task1.tryMeasures();
 
         // To execute a single Independent cascade simulation
-//        Task1.spreadInfluence("alp_prw__.*\\.txt");
+        Task1.spreadInfluence("alp_prw__.*\\.txt");
         Task1.drawSpreadInfluence("ic_iterations__.*\\.txt");
     }
 }

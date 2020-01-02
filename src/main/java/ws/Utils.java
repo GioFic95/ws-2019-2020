@@ -88,6 +88,7 @@ public class Utils {
      */
     public static IterableResult<Record, ParsingContext> readTSV(String[] headers, String path) {
         TsvParserSettings settings = new TsvParserSettings();
+        settings.setMaxCharsPerColumn(8192);
         settings.setHeaderExtractionEnabled(false);
         settings.setHeaders(headers);
         TsvParser parser = new TsvParser(settings);

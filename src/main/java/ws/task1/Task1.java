@@ -190,7 +190,7 @@ public class Task1 {
         Utils.writeLog(sb, "independent_cascade");
     }
 
-    public static void drawSpreadInfluence(String pattern) throws ImportException, IOException, URISyntaxException {
+    public static void drawSpreadInfluence(String pattern) throws IOException, URISyntaxException {
         String logPath = "logs/" + Utils.findLastLog(pattern);
         Utils.print("spread influence path: " + logPath);
         IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "currentIteration", "infectedNodes"}, logPath);
@@ -199,7 +199,6 @@ public class Task1 {
         String prevYear = "";
         StringBuilder sb = new StringBuilder()
                 .append("year").append("\t").append("numSeeds").append("\t").append("infectedNodes").append("\n");
-
 
         for (Record row : ir) {
             Integer iteration;
