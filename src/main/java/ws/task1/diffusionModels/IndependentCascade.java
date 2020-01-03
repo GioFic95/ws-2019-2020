@@ -62,7 +62,7 @@ public class IndependentCascade extends DiffusionModel{
                     if (! neighbors.isEmpty()) {
                         for (MyVertex v2 : neighbors) {
                             if (currentStatuses.get(v2) == NodeStatus.SUSCEPTIBLE) {
-                                Double threshold = propagationProbabilities.get(new SimpleDirectedEdge(v1, v2));   // Math.min(1, propagationProbabilities.get(new SimpleDirectedEdge(v1, v2)));
+                                Double threshold = propagationProbabilities.get(new SimpleDirectedEdge(v1, v2));
                                 Double coin = new Random().nextDouble();
                                 StringBuilder sb_coins = new StringBuilder()
                                         .append(v1.getId()).append(" - ").append(v2.getId()).append("\t")

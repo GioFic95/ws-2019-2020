@@ -62,12 +62,12 @@ public class DiffusionUtils {
                     .append(num/denTarget).append("\n");
         }
 
-        // Normalize and multiply by a constant factor 1.2
+        // Normalize and multiply by a constant factor 1.5
         double max = Collections.max(probabilities.values());
         probabilities = probabilities.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> 1.5*entry.getValue()/max));
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> Math.min(1, 1.5*entry.getValue()/max)));
         Utils.print("PropagationProbabilities: " + probabilities);
-        Utils.writeLog(sb, "PropagationProbabilities_" + year);
+        // Utils.writeLog(sb, "PropagationProbabilities_" + year);
         return probabilities;
     }
 

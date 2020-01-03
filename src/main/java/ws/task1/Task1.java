@@ -190,6 +190,12 @@ public class Task1 {
         Utils.writeLog(sb, "independent_cascade");
     }
 
+    /**
+     *
+     * @param pattern
+     * @throws IOException
+     * @throws URISyntaxException
+     */
     public static void drawSpreadInfluence(String pattern) throws IOException, URISyntaxException {
         String logPath = "logs/" + Utils.findLastLog(pattern);
         Utils.print("spread influence path: " + logPath);
