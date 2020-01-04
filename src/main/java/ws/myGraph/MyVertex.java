@@ -178,7 +178,7 @@ public class MyVertex {
          */
         @Override
         public JsonElement serialize(Map<MyVertex, Set<MyVertex>> myVertexSetMap, Type type, JsonSerializationContext jsonSerializationContext) {
-            Utils.print("MyMapOfMyVertexToMyVertexesSerializer " + myVertexSetMap);
+//            Utils.print("MyMapOfMyVertexToMyVertexesSerializer " + myVertexSetMap);
             JsonObject jo = new JsonObject();
             myVertexSetMap.forEach((k, v) -> {
                 JsonElement jek = new MyVertex.MyVertexSerializer().serialize(k, type, jsonSerializationContext);

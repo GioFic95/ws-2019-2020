@@ -56,9 +56,6 @@ public class Main {
     public static void main(String... args) throws ExportException, IOException, URISyntaxException, TransformerException, ImportException {
 //        preprocessing();
 //        Task1.tryMeasures();
-
-        // To execute a single Independent cascade simulation
-        Task1.spreadInfluence("alp_prw__.*\\.txt");
-        Task1.drawSpreadInfluence("ic_iterations__.*\\.txt");
+        Task1.multipleIndependentCascadeFlow(30);
     }
 }

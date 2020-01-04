@@ -157,7 +157,7 @@ public class GraphUtils {
     public static void writeImage(File dot, String path, String name) throws IOException, URISyntaxException {
         MutableGraph g = Parser.read(dot);
         File imgFile = Utils.getNewFile(path, name, "svg");
-        Utils.print(imgFile.getParentFile().exists());
+//        Utils.print(imgFile.getParentFile().exists());
         Graphviz.fromGraph(g).width(700).render(Format.SVG).toFile(imgFile);
     }
 
@@ -180,7 +180,7 @@ public class GraphUtils {
             }
         });
         File imgFile = Utils.getNewFile(path, name, "svg");
-        Utils.print(imgFile.getParentFile().exists());
+//        Utils.print(imgFile.getParentFile().exists());
         Graphviz.fromGraph(g).width(700).render(Format.SVG).toFile(imgFile);
     }
 
@@ -223,7 +223,7 @@ public class GraphUtils {
         });
 
         File imgFile = Utils.getNewFile(path, name, "svg");
-        Utils.print(imgFile.getParentFile().exists());
+//        Utils.print(imgFile.getParentFile().exists());
         Graphviz.fromGraph(g).width(700).render(Format.SVG).toFile(imgFile);
     }
 

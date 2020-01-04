@@ -56,7 +56,7 @@ public class DiffusionUtils {
             probabilities.put(new SimpleDirectedEdge(source, target), num/denSource);
             probabilities.put(new SimpleDirectedEdge(target, source), num/denTarget);
 
-            Utils.print("num: " + num + ", denSource: " + denSource + ", denTarget: " + denTarget);
+//            Utils.print("num: " + num + ", denSource: " + denSource + ", denTarget: " + denTarget);
             sb.append("num: ").append(num).append(", denSource: ").append(denSource).append(", denTarget: ")
                     .append(denTarget).append(", ratioSource: ").append(num/denSource).append(", ratioTarget: ")
                     .append(num/denTarget).append("\n");

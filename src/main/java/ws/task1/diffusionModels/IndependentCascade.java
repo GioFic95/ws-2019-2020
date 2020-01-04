@@ -111,7 +111,7 @@ public class IndependentCascade extends DiffusionModel{
 
     /**
      * Independent Cascade
-     * todo
+     * todo remove this method if useless as it seems.
      * @return todo
      * @see <a href="http://www.sumankundu.info/articles/detail/How-To-Code-Independent-Cascade-Model-of-Information-Diffusion#lis:Single-Diffusion" target="_blank">Independent Cascade Model of Information Diffusion - Suman Kundu</a>.
      */

@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 import static ws.myGraph.GraphUtils.*;
+import static ws.task1.Task1.*;
 
 public class Tests {
     private Tests() {} // ensure non-instantiability.
@@ -46,7 +47,10 @@ public class Tests {
 //        testDirectedEdgesProbabilities();
 
         // test the functioning of the serialization and deserialization of maps containing MyVertex objects
-        testMyVertexSerialization();
+//        testMyVertexSerialization();
+
+        // test a single flow of independent cascade simulation
+        singleIndependentCascadeFlow();
     }
 
     public static void demoDS1() throws ExportException, IOException, ImportException, URISyntaxException {
@@ -254,5 +258,21 @@ public class Tests {
             });
             return jo;
         }
+    }
+
+    /**
+     * Execute a single Independent cascade simulation
+     * @throws ImportException
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static void singleIndependentCascadeFlow() throws ImportException, IOException, URISyntaxException {
+        // draw the plots for a specified independent cascade simulation log file
+        drawSpreadInfluence("ic_results__2020_01_03__12_43_36.txt", "test1");
+
+        // execute, log and plot a new independent cascade simulation
+        spreadInfluence("alp_prw__.*\\.txt");
+        writeUnifiedSpreadInfluence("ic_iterations__.*\\.txt");
+        drawSpreadInfluence("", "test2");
     }
 }

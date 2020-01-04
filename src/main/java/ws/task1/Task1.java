@@ -1,14 +1,17 @@
 package ws.task1;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.univocity.parsers.common.IterableResult;
 import com.univocity.parsers.common.ParsingContext;
+import com.univocity.parsers.common.ResultIterator;
 import com.univocity.parsers.common.record.Record;
 import org.jgrapht.Graph;
 
 import org.jgrapht.io.ImportException;
 import org.json.JSONArray;
+import ws.Main;
 import ws.Utils;
 import ws.myGraph.GraphUtils;
 import ws.myGraph.MyEdgeDS1;
@@ -22,10 +25,16 @@ import ws.weights.Weight;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -196,11 +205,12 @@ public class Task1 {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static void drawSpreadInfluence(String pattern) throws IOException, URISyntaxException {
+    public static void writeUnifiedSpreadInfluence(String pattern) throws IOException, URISyntaxException {
         String logPath = "logs/" + Utils.findLastLog(pattern);
         Utils.print("spread influence path: " + logPath);
         IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "currentIteration", "infectedNodes"}, logPath);
-        Map<String, Set<String>> infectedNodesIds = new HashMap<>();
+        Map<MyVertex, Set<MyVertex>> infectedNodesUnified = new HashMap<>();
+        Type type = new TypeToken<Map<MyVertex, Set<MyVertex>>>(){}.getType();
         int seedNum = 0;
         String prevYear = "";
         StringBuilder sb = new StringBuilder()
@@ -216,38 +226,31 @@ public class Task1 {
             }
             String year = row.getString("year");
             String infectedNodesJson = row.getString("infectedNodes");
-            Type type = new TypeToken<Map<MyVertex, Set<MyVertex>>>(){}.getType();
             Map<MyVertex, Set<MyVertex>> infectedNodes = MyVertex.getGson().fromJson(infectedNodesJson, type);
 
             if (iteration == 1) {   // new cascade
                 // If the map of node names isn't empty (this isn't the first cascade), draw the graph relative
                 // to the previous cascade, that is terminated, before starting the new one
-                if (! infectedNodesIds.isEmpty()) {
-                    File file = Utils.getNewFile("graphs/ds1", prevYear, "dot");
-                    String name = prevYear + "_" + seedNum;
-                    GraphUtils.writeImage(file, "plots/ic", name, infectedNodesIds);
-                    Utils.print("writing graph " + name);
-
+                if (! infectedNodesUnified.isEmpty()) {
                     // Add the previous cascade results to the log
-                    sb.append(prevYear).append("\t").append(seedNum).append("\t").append(infectedNodesIds).append("\n");
+                    String name = prevYear + "_" + seedNum;
+                    Utils.print("writing graph " + name);
+                    String infectedNodesUnifiedJson = MyVertex.getGson().toJson(infectedNodesUnified, type);
+                    sb.append(prevYear).append("\t").append(seedNum).append("\t").append(infectedNodesUnifiedJson).append("\n");
                 }
 
                 // begin analysing the new cascade
                 prevYear = year;
                 seedNum = infectedNodes.size();
-
-                infectedNodesIds = infectedNodes.entrySet().stream().collect(Collectors.toMap(
-                        myVertexSetEntry -> myVertexSetEntry.getKey().getId(),
-                        myVertexSetEntry -> myVertexSetEntry.getValue().stream().map(MyVertex::getId).collect(Collectors.toSet())
-                ));
+                infectedNodesUnified = infectedNodes;
 
             } else {   // old cascade
                 // add current infected nodes to the previous ones
                 for (Map.Entry<MyVertex, Set<MyVertex>> entry : infectedNodes.entrySet()) {
-                    String newSeed = entry.getKey().getId();
-                    Set<String> newInfectedNeighbors = entry.getValue().stream().map(MyVertex::getId).collect(Collectors.toSet());
+                    MyVertex newSeed = entry.getKey();
+                    Set<MyVertex> newInfectedNeighbors = entry.getValue();
 
-                    infectedNodesIds.forEach((seedId, infectedNeighborsIds) -> {
+                    infectedNodesUnified.forEach((seedId, infectedNeighborsIds) -> {
                         if (infectedNeighborsIds.contains(newSeed)) {
                             infectedNeighborsIds.addAll(newInfectedNeighbors);
                         }
@@ -255,14 +258,117 @@ public class Task1 {
                 }
             }
         }
-        // Write the last cascade plot and add the relative log
-        File file = Utils.getNewFile("graphs/ds1", prevYear, "dot");
+        // Write the last cascade log
         String name = prevYear + "_" + seedNum;
-        GraphUtils.writeImage(file, "plots/ic", name, infectedNodesIds);
         Utils.print("writing graph " + name);
-        sb.append(prevYear).append("\t").append(seedNum).append("\t").append(infectedNodesIds).append("\n");
+        String infectedNodesUnifiedJson = MyVertex.getGson().toJson(infectedNodesUnified, type);
+        sb.append(prevYear).append("\t").append(seedNum).append("\t").append(infectedNodesUnifiedJson).append("\n");
 
         // Write the independent cascade results log
         Utils.writeLog(sb, "ic_results");
+    }
+
+    /**
+     * If {@param filename} is null or empty string, the last independent cascade unified log is used
+     * (as produced by {@link #writeUnifiedSpreadInfluence(String)}).
+     * @param fileName
+     * @param dirName
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static void drawSpreadInfluence(String fileName, String dirName) throws URISyntaxException, IOException {
+        // Prepare the output dir and file
+        String pathName = dirName == null || dirName.equals("") ? "ic" : "ic_" + dirName;
+        File dir = new File(Main.class.getResource("plots").toURI().getPath() + "\\" + pathName);
+        if (! dir.isDirectory()) {
+            if (!dir.mkdir()) {
+                Utils.print("the directory " + dirName + "does not exist and can't be created.");
+            }
+        }
+        if (fileName == null || fileName.equals("")) {
+            fileName = Utils.findLastLog("ic_results__.*\\.txt");
+        }
+
+        IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "numSeeds", "infectedNodes"}, "logs/" + fileName);
+        Type type = new TypeToken<Map<MyVertex, Set<MyVertex>>>(){}.getType();
+        for (Record row : ir) {
+            String year = row.getString("year");
+            String numSeeds = row.getString("numSeeds");
+            String infectedNodesJson = row.getString("infectedNodes");
+            Map<MyVertex, Set<MyVertex>> infectedNodes;
+            try {
+                infectedNodes = MyVertex.getGson().fromJson(infectedNodesJson, type);
+            } catch (JsonSyntaxException ex) {
+                Utils.print("Can't parse string '" + infectedNodesJson + "' as json.");
+                continue;
+            }
+            Map<String, Set<String>> infectedNodesIds = infectedNodes.entrySet().stream().collect(Collectors.toMap(
+                    myVertexSetEntry -> myVertexSetEntry.getKey().getId(),
+                    myVertexSetEntry -> myVertexSetEntry.getValue().stream().map(MyVertex::getId).collect(Collectors.toSet())
+            ));
+            String outName = year + "_" + numSeeds;
+            Utils.print("writing graph '" + outName + "' in dir 'plots/" + pathName + "'");
+            File file = Utils.getNewFile("graphs/ds1", year, "dot");
+            GraphUtils.writeImage(file, "plots/" + pathName, outName, infectedNodesIds);
+        }
+    }
+
+    /**
+     * Merge the last {@param n} independent cascade results.
+     * @param n
+     */
+    private static void mergeSpreadInfluenceResults(int n) throws URISyntaxException, IOException {
+        Type type = new TypeToken<Map<MyVertex, Set<MyVertex>>>() {}.getType();
+        List<String> fileNames = Utils.findLastLogs("ic_results__.*\\.txt", n);
+        StringBuilder sb = new StringBuilder();
+
+        // Create a list of iterators over the selected log files
+        List<ResultIterator<Record, ParsingContext>> iterators = new ArrayList<>();
+        for (String fileName : fileNames) {
+            ResultIterator<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "numSeeds", "infectedNodes"}, "logs/" + fileName).iterator();
+            iterators.add(ir);
+        }
+
+        // Throw away the first row, which contains the header of the tsv file
+        iterators.forEach(Iterator::next);
+
+        while (iterators.get(0).hasNext()) {
+            Map<MyVertex, Set<MyVertex>> infectedNodesMerged = new HashMap<>();
+            List<Record> currentRows = new ArrayList<>();
+            iterators.forEach(it -> currentRows.add(it.next()));
+
+            String year = currentRows.get(0).getString("year");
+            String seedNum = currentRows.get(0).getString("numSeeds");
+            List<Map<MyVertex, Set<MyVertex>>> infectedNodes = new ArrayList<>();
+            currentRows.forEach(row -> infectedNodes.add(MyVertex.getGson().fromJson(row.getString("infectedNodes"), type)));
+
+            infectedNodes.forEach(
+                    myVertexSetMap -> myVertexSetMap.forEach(
+                            (seed, infected) -> infectedNodesMerged.merge(seed, infected,
+                                    (BiFunction<Set<MyVertex>, Set<MyVertex>, Set<MyVertex>>) (myVertices, myVertices2) -> {
+                                        myVertices.addAll(myVertices2);
+                                        return myVertices;
+            })));
+            // todo controllare se un nodo compare in più insiemi, fare merge con similarità tra topic, eventualmente con parole singole
+
+
+            // Add the current record to the output file
+            String name = year + "_" + seedNum;
+            Utils.print("writing graph " + name);
+            String infectedNodesMergedJson = MyVertex.getGson().toJson(infectedNodesMerged, type);
+            sb.append(year).append("\t").append(seedNum).append("\t").append(infectedNodesMergedJson).append("\n");
+        }
+
+        // Write the merged independent cascade log
+        Utils.writeLog(sb, "ic_results_merged");
+    }
+
+    public static void multipleIndependentCascadeFlow(int n) throws ImportException, IOException, URISyntaxException {
+        for (int i=0; i<n; i++) {
+            spreadInfluence("alp_prw__.*\\.txt");
+            writeUnifiedSpreadInfluence("ic_iterations__.*\\.txt");
+        }
+        mergeSpreadInfluenceResults(n);
+        drawSpreadInfluence("", "");
     }
 }

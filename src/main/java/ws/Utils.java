@@ -14,10 +14,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -109,8 +106,12 @@ public class Utils {
     @NotNull
     @Contract("_, _, _ -> new")
     public static File getNewFile(String pathName, String fileName, String ext) throws URISyntaxException {
-        URI res = Main.class.getResource(pathName).toURI();
-//        print(fileName + " " + new File(res).exists());
+        URI res;
+        try {
+            res = Main.class.getResource(pathName).toURI();
+        } catch (NullPointerException ex) {
+            throw new NullPointerException("The selected directory " + pathName + " does not exist.");
+        }
 
         String path = res.getPath() + "/" + fileName + "." + ext;
 //        print(path);
@@ -131,18 +132,22 @@ public class Utils {
         }
     }
 
-    public static String findLastLog(String pattern) throws URISyntaxException {
+    public static List<String> findLastLogs(String pattern, int n) throws URISyntaxException {
         URI res = Main.class.getResource("logs").toURI();
         File folder = new File(res);
         final File[] files = folder.listFiles((dir, name) -> name.matches(pattern));
 //        print(files);
         if (files != null) {
-            final List<String> names = Arrays.stream(files).map(File::getName).collect(Collectors.toList());
+            final List<String> names = Arrays.stream(files).map(File::getName).sorted(Comparator.naturalOrder()).collect(Collectors.toList());
             print(names);
-            return Collections.max(names, Comparator.naturalOrder());
+            return names.subList(Math.max(names.size() - n, 0), names.size());
         } else {
             print("no matching files");
-            return null;
+            return new ArrayList<>();
         }
+    }
+
+    public static String findLastLog(String pattern) throws URISyntaxException {
+        return findLastLogs(pattern, 1).get(0);
     }
 }
