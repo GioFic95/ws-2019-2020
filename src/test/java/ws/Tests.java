@@ -177,7 +177,7 @@ public class Tests {
 
     private static void testDirectedEdgesProbabilities() throws ImportException, IOException, URISyntaxException {
         Graph<MyVertex, MyEdgeDS1> graph = GraphUtils.loadDS1Graph("2000");
-        Map<SimpleDirectedEdge, Double> probabilities = DiffusionUtils.getEdgePropagationProbabilities(graph, "2000");
+        Map<SimpleDirectedEdge, Double> probabilities = DiffusionUtils.getEdgePropagationProbabilities(graph, "2000", 2);
         MyVertex v1 = new MyVertex("43.80.+p");
         MyVertex v2 = new MyVertex("lyapunov functional");
         SimpleDirectedEdge edge1 = new SimpleDirectedEdge(v1, v2);
@@ -271,7 +271,7 @@ public class Tests {
         drawSpreadInfluence("ic_results__2020_01_03__12_43_36.txt", "test1");
 
         // execute, log and plot a new independent cascade simulation
-        spreadInfluence("alp_prw__.*\\.txt");
+        spreadInfluence("alp_prw__.*\\.txt", 2);
         writeUnifiedSpreadInfluence("ic_iterations__.*\\.txt");
         drawSpreadInfluence("", "test2");
     }

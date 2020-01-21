@@ -9,6 +9,7 @@ import com.univocity.parsers.common.ResultIterator;
 import com.univocity.parsers.common.record.Record;
 import org.jgrapht.Graph;
 
+import org.jgrapht.alg.util.UnorderedPair;
 import org.jgrapht.io.ImportException;
 import org.json.JSONArray;
 import ws.Main;
@@ -153,7 +154,7 @@ public class Task1 {
         }
     }
 
-    public static void spreadInfluence(String pattern) throws ImportException, IOException, URISyntaxException {
+    public static void spreadInfluence(String pattern, double k) throws ImportException, IOException, URISyntaxException {
         String logPath = "logs/" + Utils.findLastLog(pattern);
         Utils.print("spread influence path: " + logPath);
         IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "k", "seeds"}, logPath);
@@ -182,7 +183,7 @@ public class Task1 {
             Utils.print("\nyear: " + year + ", seeds: " + seeds.size() + " - " + seeds);
 
             Graph<MyVertex, MyEdgeDS1> graph = GraphUtils.loadDS1Graph(year);
-            Map<SimpleDirectedEdge, Double> probabilities = DiffusionUtils.getEdgePropagationProbabilities(graph, year);
+            Map<SimpleDirectedEdge, Double> probabilities = DiffusionUtils.getEdgePropagationProbabilities(graph, year, k);
             IndependentCascade independentCascade = new IndependentCascade(name, year, graph, seeds, probabilities);
             Set<String> infected = Collections.emptySet();
             while (true) {
@@ -271,22 +272,25 @@ public class Task1 {
     /**
      * If {@param filename} is null or empty string, the last independent cascade unified log is used
      * (as produced by {@link #writeUnifiedSpreadInfluence(String)}).
-     * @param fileName
+     * @param fileNamePattern
      * @param dirName
      * @throws URISyntaxException
      * @throws IOException
      */
-    public static void drawSpreadInfluence(String fileName, String dirName) throws URISyntaxException, IOException {
+    public static void drawSpreadInfluence(String fileNamePattern, String dirName) throws URISyntaxException, IOException {
         // Prepare the output dir and file
         String pathName = dirName == null || dirName.equals("") ? "ic" : "ic_" + dirName;
+        String fileName;
         File dir = new File(Main.class.getResource("plots").toURI().getPath() + "\\" + pathName);
         if (! dir.isDirectory()) {
             if (!dir.mkdir()) {
                 Utils.print("the directory " + dirName + "does not exist and can't be created.");
             }
         }
-        if (fileName == null || fileName.equals("")) {
+        if (fileNamePattern == null || fileNamePattern.equals("")) {
             fileName = Utils.findLastLog("ic_results__.*\\.txt");
+        } else {
+            fileName = Utils.findLastLog(fileNamePattern);
         }
 
         IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "numSeeds", "infectedNodes"}, "logs/" + fileName);
@@ -317,10 +321,13 @@ public class Task1 {
      * Merge the last {@param n} independent cascade results.
      * @param n
      */
-    private static void mergeSpreadInfluenceResults(int n) throws URISyntaxException, IOException {
+    private static void mergeSpreadInfluenceResults(int n, double threshold) throws URISyntaxException, IOException {
         Type type = new TypeToken<Map<MyVertex, Set<MyVertex>>>() {}.getType();
-        List<String> fileNames = Utils.findLastLogs("ic_results__.*\\.txt", n);
-        StringBuilder sb = new StringBuilder();
+        List<String> fileNames = Utils.findLastLogs("ic_results__[0-9].*\\.txt", n);
+        StringBuilder sb1 = new StringBuilder()
+                .append("year").append("\t").append("numSeeds").append("\t").append("infectedNodes").append("\n");
+        StringBuilder sb2 = new StringBuilder()
+                .append("year").append("\t").append("numSeeds").append("\t").append("infectedNodes").append("\n");
 
         // Create a list of iterators over the selected log files
         List<ResultIterator<Record, ParsingContext>> iterators = new ArrayList<>();
@@ -342,6 +349,7 @@ public class Task1 {
             List<Map<MyVertex, Set<MyVertex>>> infectedNodes = new ArrayList<>();
             currentRows.forEach(row -> infectedNodes.add(MyVertex.getGson().fromJson(row.getString("infectedNodes"), type)));
 
+            // todo decidere se considerare tutti i topic infettati anche solo una volta o solo quelli infettati almeno q volte
             infectedNodes.forEach(
                     myVertexSetMap -> myVertexSetMap.forEach(
                             (seed, infected) -> infectedNodesMerged.merge(seed, infected,
@@ -349,26 +357,99 @@ public class Task1 {
                                         myVertices.addAll(myVertices2);
                                         return myVertices;
             })));
-            // todo controllare se un nodo compare in più insiemi, fare merge con similarità tra topic, eventualmente con parole singole
 
-
-            // Add the current record to the output file
+            // Add the current record to the output file, first phase of merge
             String name = year + "_" + seedNum;
-            Utils.print("writing graph " + name);
+            Utils.print("writing graph " + name + ", phase 1");
             String infectedNodesMergedJson = MyVertex.getGson().toJson(infectedNodesMerged, type);
-            sb.append(year).append("\t").append(seedNum).append("\t").append(infectedNodesMergedJson).append("\n");
+            sb1.append(year).append("\t").append(seedNum).append("\t").append(infectedNodesMergedJson).append("\n");
+
+            // Look for nodes that appear in more sets   todo è un passaggio inutile, si può togliere
+            Map<MyVertex, Integer> counter = new HashMap<>();
+            for (Set<MyVertex> set : infectedNodesMerged.values()) {
+                set.forEach( mv -> counter.merge(mv, 1, Integer::sum));
+            }
+            Set<MyVertex> intersection = counter.entrySet().stream().filter(entry -> entry.getValue() > 1).map(Map.Entry::getKey).collect(Collectors.toSet());
+            Utils.print("These nodes appear in more sets: " + intersection);
+
+
+            // todo fare merge con similarità tra topic, eventualmente con parole singole
+
+            // compute similarities
+            Map<UnorderedPair<MyVertex, MyVertex>, Double> similarities = new HashMap<>();
+            for (Map.Entry<MyVertex, Set<MyVertex>> entry1 : infectedNodesMerged.entrySet()) {
+                for (Map.Entry<MyVertex, Set<MyVertex>> entry2 : infectedNodesMerged.entrySet()) {
+                    UnorderedPair<MyVertex, MyVertex> pair = new UnorderedPair<>(entry1.getKey(), entry2.getKey());
+                    if (!similarities.containsKey(pair)) {
+                        // compute overlap coefficient
+                        Set<MyVertex> intersect = new HashSet<>(entry1.getValue());
+                        intersect.retainAll(entry2.getValue());
+                        double sim = (double) intersect.size() / Math.min(entry1.getValue().size(), entry2.getValue().size());
+                        similarities.put(pair, sim);
+                    }
+                }
+            }
+
+            // Create set of similar pairs of sets
+            Set<UnorderedPair<MyVertex, MyVertex>> similarSets = similarities.entrySet().stream()
+                    .filter(entry -> entry.getValue() > threshold)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
+
+            // creates groups of sets with high similarity
+            Set<Set<MyVertex>> groups = new HashSet<>();
+            Set<MyVertex> merged = new HashSet<>();
+            for (UnorderedPair<MyVertex, MyVertex> set1 : similarSets) {
+                MyVertex v1 = set1.getFirst();
+                MyVertex v2 = set1.getSecond();
+                Set<MyVertex> currGroup = new HashSet<>();
+
+                // todo decidere se, dati due insiemi simili A e B, basta che un terzo insieme C sia simile ad uno tra A e B o debba essere simile a entrambi per essere aggiunto al gruppo
+                Set<UnorderedPair<MyVertex, MyVertex>> tempSim = similarSets.stream()
+                        .filter(entry -> entry.hasElement(v1) || entry.hasElement(v2))
+                        .collect(Collectors.toSet());
+                tempSim.forEach(pair -> {
+                    currGroup.add(pair.getFirst());
+                    currGroup.add(pair.getSecond());
+                });
+
+                groups.add(currGroup);
+                merged.addAll(currGroup);
+            }
+
+            Map<MyVertex, Set<MyVertex>> infectedNodesMerged2 = new HashMap<>();
+            groups.forEach(group -> {
+                List<MyVertex> l = new ArrayList<>(group);
+                MyVertex seed = l.remove(0);
+                Set<MyVertex> infected = new HashSet<>(l);
+                group.forEach(mv -> infected.addAll(infectedNodesMerged.get(mv)));
+                infectedNodesMerged2.put(seed, infected);
+            });
+            infectedNodesMerged.forEach((k, v) -> {
+                if (!merged.contains(k)) {
+                    infectedNodesMerged2.put(k, v);
+                }
+            });
+
+            // Add the current record to the output file, second phase of merge
+            Utils.print("writing graph " + name + ", phase 2");
+            infectedNodesMergedJson = MyVertex.getGson().toJson(infectedNodesMerged2, type);
+            sb2.append(year).append("\t").append(seedNum).append("\t").append(infectedNodesMergedJson).append("\n");
         }
 
         // Write the merged independent cascade log
-        Utils.writeLog(sb, "ic_results_merged");
+        Utils.writeLog(sb1, "ic_results_merged1");
+        Utils.writeLog(sb2, "ic_results_merged2");
     }
 
-    public static void multipleIndependentCascadeFlow(int n) throws ImportException, IOException, URISyntaxException {
-        for (int i=0; i<n; i++) {
-            spreadInfluence("alp_prw__.*\\.txt");
+    public static void multipleIndependentCascadeFlow(int n, double k, double threshold, String name) throws ImportException, IOException, URISyntaxException {
+        for (int i=1; i<=n; i++) {
+            spreadInfluence("alp_prw__.*\\.txt", k);
             writeUnifiedSpreadInfluence("ic_iterations__.*\\.txt");
+            drawSpreadInfluence("", name + i);
         }
-        mergeSpreadInfluenceResults(n);
-        drawSpreadInfluence("", "");
+        mergeSpreadInfluenceResults(n, threshold);
+        drawSpreadInfluence("ic_results_merged1.*\\.txt", name + "merge1");
+        drawSpreadInfluence("ic_results_merged2.*\\.txt", name + "merge2");
     }
 }

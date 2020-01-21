@@ -85,7 +85,7 @@ public class Utils {
      */
     public static IterableResult<Record, ParsingContext> readTSV(String[] headers, String path) {
         TsvParserSettings settings = new TsvParserSettings();
-        settings.setMaxCharsPerColumn(8192);
+        settings.setMaxCharsPerColumn(100_000);
         settings.setHeaderExtractionEnabled(false);
         settings.setHeaders(headers);
         TsvParser parser = new TsvParser(settings);
@@ -104,7 +104,6 @@ public class Utils {
      * @throws URISyntaxException if it can't build a valid {@link java.net.URI} from the given file name.
      */
     @NotNull
-    @Contract("_, _, _ -> new")
     public static File getNewFile(String pathName, String fileName, String ext) throws URISyntaxException {
         URI res;
         try {
@@ -139,7 +138,7 @@ public class Utils {
 //        print(files);
         if (files != null) {
             final List<String> names = Arrays.stream(files).map(File::getName).sorted(Comparator.naturalOrder()).collect(Collectors.toList());
-            print(names);
+            print("matching files: " + names);
             return names.subList(Math.max(names.size() - n, 0), names.size());
         } else {
             print("no matching files");
@@ -149,5 +148,11 @@ public class Utils {
 
     public static String findLastLog(String pattern) throws URISyntaxException {
         return findLastLogs(pattern, 1).get(0);
+    }
+
+    public static void printNow() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd__HH_mm_ss");
+        String now = LocalDateTime.now().format(formatter);
+        print(now);
     }
 }

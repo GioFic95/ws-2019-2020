@@ -14,6 +14,8 @@ import ws.task1.Task1;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 public class Main {
@@ -54,8 +56,14 @@ public class Main {
      * @throws ImportException if raised by {@link Task1#tryMeasures()}.
      */
     public static void main(String... args) throws ExportException, IOException, URISyntaxException, TransformerException, ImportException {
+//        Utils.printNow();
 //        preprocessing();
+//        Utils.printNow();
 //        Task1.tryMeasures();
-        Task1.multipleIndependentCascadeFlow(30);
+        Utils.printNow();
+        Task1.multipleIndependentCascadeFlow(30, 1.5,0.5, "15_");
+        Utils.printNow();
+        Task1.multipleIndependentCascadeFlow(30, 1,0.5, "1_");
+        Utils.printNow();
     }
 }

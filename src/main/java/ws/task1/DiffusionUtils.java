@@ -39,7 +39,7 @@ public class DiffusionUtils {
      * @throws URISyntaxException todo
      * @see <a href="https://stackoverflow.com/questions/5969447/java-random-integer-with-non-uniform-distribution" target="_blank">Java: random integer with non-uniform distribution</a>
      */
-    public static Map<SimpleDirectedEdge, Double> getEdgePropagationProbabilities(Graph<MyVertex, MyEdgeDS1> graph, String year)
+    public static Map<SimpleDirectedEdge, Double> getEdgePropagationProbabilities(Graph<MyVertex, MyEdgeDS1> graph, String year, double k)
             throws IOException, URISyntaxException {
         StringBuilder sb = new StringBuilder();
 
@@ -65,7 +65,7 @@ public class DiffusionUtils {
         // Normalize and multiply by a constant factor 1.5
         double max = Collections.max(probabilities.values());
         probabilities = probabilities.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> Math.min(1, 1.5*entry.getValue()/max)));
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> Math.min(1, k*entry.getValue()/max)));
         Utils.print("PropagationProbabilities: " + probabilities);
         // Utils.writeLog(sb, "PropagationProbabilities_" + year);
         return probabilities;

@@ -30,10 +30,10 @@ public class Prova {
 //            e.printStackTrace();
 //        }
 
-//        MyVertex v1 = new MyVertex("v1");
-//        MyVertex v2 = new MyVertex("v2");
-//        MyVertex v3 = new MyVertex("v3");
-//        MyVertex v4 = new MyVertex("v4");
+        MyVertex v1 = new MyVertex("v1");
+        MyVertex v2 = new MyVertex("v2");
+        MyVertex v3 = new MyVertex("v3");
+        MyVertex v4 = new MyVertex("v4");
 //        Set<MyVertex> s = new HashSet<>();
 //        s.add(v1);
 //        s.add(v2);
@@ -86,6 +86,7 @@ public class Prova {
         Utils.print(map.get("quattro"));
         Utils.print(map.putIfAbsent("tre", 4));
 
+        Utils.print(map);
         Utils.print("compute " + map.compute("quattro", (s, integer) -> {
             Utils.print("s " + s);
             Utils.print("int " + integer);
@@ -94,7 +95,7 @@ public class Prova {
             else return 1;
         }));
 
-        Utils.print(map);
+        /*Utils.print(map);
         Map<Integer, String> map3 = map.entrySet().stream().collect(Collectors.toMap(
                 stringIntegerEntry -> stringIntegerEntry.getKey().length(),
                 stringIntegerEntry -> String.valueOf(stringIntegerEntry.getValue())));
@@ -103,6 +104,26 @@ public class Prova {
         Utils.print(s);
         Type type = new TypeToken<Map<Integer, String>>(){}.getType();
         Map<Integer, String> obj = new Gson().fromJson(s, type);
-        Utils.print(obj);
+        Utils.print(obj);*/
+
+        Utils.print(map);
+        Utils.print("merge " + map.merge("quattro", 1, Integer::sum));
+        Utils.print(map);
+        Utils.print("merge " + map.merge("cinquemila", 1, Integer::sum));
+        Utils.print(map);
+
+        HashMap<String, Integer> map3 = new HashMap<>();
+        String[] ss = {"uno", "due", "tre", "uno", "sette", "due", "uno"};
+        for (String s : ss) {
+            map3.merge(s, 1, Integer::sum);
+        }
+        Utils.print(map3);
+
+        HashMap<MyVertex, Integer> map4 = new HashMap<>();
+        MyVertex[] mvs = {v1, v2, v3, v2, v4, v1, v2};
+        for (MyVertex mv : mvs) {
+            map4.merge(mv, 1, Integer::sum);
+        }
+        Utils.print(map4);
     }
 }
