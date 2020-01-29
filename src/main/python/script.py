@@ -1,8 +1,10 @@
+import collections
 import re
 import os
 import sys
 import glob
 import datetime
+import pprint
 import pandas as pd
 import numpy as np
 from scipy import stats
@@ -90,7 +92,24 @@ def create_dirs():
                 print(directory + " already exists")
 
 
-if __name__ == '__main__':
-    top_k_scores_stats()
-    # create_dirs()
+def check_infected_count(year, numSeeds):
+    if os.path.basename(os.getcwd()) != "logs":
+        os.chdir("..\\..\\..\\target\\classes\\ws\\logs")
+    results_logs = glob.glob("./ic_results__*.txt")
+    results_logs.sort()
+    results_logs = results_logs[-30:]
+    print(results_logs)
+    counter = collections.defaultdict(collections.Counter)
+    for rl in results_logs:
+        df = pd.read_csv(rl, sep="\t")
+        mymap = eval(df.loc[df["year"] == year].loc[df["numSeeds"] == numSeeds, "infectedNodes"].values[0])
+        for k, v in mymap.items():
+            counter[k] += collections.Counter(v)
+    pprint.pprint(counter)
 
+
+if __name__ == '__main__':
+    # top_k_scores_stats()
+    # create_dirs()
+    check_infected_count(2001, 5)
+    check_infected_count(2018, 10)

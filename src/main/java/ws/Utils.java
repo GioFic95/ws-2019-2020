@@ -5,6 +5,7 @@ import com.univocity.parsers.common.ParsingContext;
 import com.univocity.parsers.common.record.Record;
 import com.univocity.parsers.tsv.TsvParser;
 import com.univocity.parsers.tsv.TsvParserSettings;
+import guru.nidi.graphviz.attribute.Color;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,6 +16,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 /**
@@ -135,7 +137,6 @@ public class Utils {
         URI res = Main.class.getResource("logs").toURI();
         File folder = new File(res);
         final File[] files = folder.listFiles((dir, name) -> name.matches(pattern));
-//        print(files);
         if (files != null) {
             final List<String> names = Arrays.stream(files).map(File::getName).sorted(Comparator.naturalOrder()).collect(Collectors.toList());
             print("matching files: " + names);
@@ -154,5 +155,12 @@ public class Utils {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd__HH_mm_ss");
         String now = LocalDateTime.now().format(formatter);
         print(now);
+    }
+
+    public static Color getRandColor() {
+        int red = ThreadLocalRandom.current().nextInt(50, 156);
+        int green = ThreadLocalRandom.current().nextInt(50, 156);
+        int blue = ThreadLocalRandom.current().nextInt(50, 156);
+        return Color.rgb(red, green, blue);
     }
 }

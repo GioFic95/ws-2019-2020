@@ -60,10 +60,16 @@ public class Main {
 //        preprocessing();
 //        Utils.printNow();
 //        Task1.tryMeasures();
+//        Utils.printNow();
+//        Task1.multipleIndependentCascadeFlow(30, 1.5, 0.5, true, "15_");
+//        Utils.printNow();
+//        Task1.multipleIndependentCascadeFlow(30, 1, 0.5, true, "1_");
+//        Utils.printNow();
+//        Task1.multipleIndependentCascadeFlow(30, 1, 0.7, false, "2_");
+//        Utils.printNow();
+//        Task1.multipleIndependentCascadeFlow(30, 1, 0.8, false, "4_");
         Utils.printNow();
-        Task1.multipleIndependentCascadeFlow(30, 1.5,0.5, "15_");
-        Utils.printNow();
-        Task1.multipleIndependentCascadeFlow(30, 1,0.5, "1_");
+        Task1.multipleIndependentCascadeFlow(30, 1, 0.8, false, "5_");
         Utils.printNow();
     }
 }

@@ -185,42 +185,57 @@ public class GraphUtils {
     }
 
     /**
-     * Creates and stores a plot of the graph written into the given DOT file, the given nodes are colored.
+     * Creates and stores a plot of the graph written into the given DOT file, the given nodes are colored. todo
      * It uses {@link Graphviz} to read the graph and produce the plot.
      * @param dot   The DOT file containing the serialized graph.
      * @param path  The path where to save the produced image.
      * @param name  The name to give to the produced image.
-     * @param nodes The keys that identify the nodes to be colored in the output plot.
+     * @param nodes The keys that identify the nodes to be colored in the output plot. todo
      * @throws IOException if can't read the input file.
      * @throws URISyntaxException if raised by {@link Utils#getNewFile(String, String, String)}).
      */
-    public static void writeImage(File dot, String path, String name, Map<String, Set<String>> nodes) throws IOException, URISyntaxException {
+    public static void writeImage(File dot, String path, String name, Map<?, Set<String>> nodes) throws IOException, URISyntaxException {
         MutableGraph g = Parser.read(dot);
         Map<String, MutableNode> gNodes = g.nodes().stream().collect(Collectors.toMap(
                 entry -> entry.name().toString(), entry -> entry));
 
-        nodes.forEach((seed, infected) -> {
-            int red = ThreadLocalRandom.current().nextInt(50, 156);
-            int green = ThreadLocalRandom.current().nextInt(50, 156);
-            int blue = ThreadLocalRandom.current().nextInt(50, 156);
-            Color c = Color.rgb(red, green, blue);
-            if (name.contains("2018_10")) // todo debug
-                Utils.print("entry: " + seed + "-" + infected);
+        try {
+            Map<String, Set<String>> nodes1 = (Map<String, Set<String>>) nodes;
+            nodes1.forEach((seed, infected) -> {
+                Color c = Utils.getRandColor();
 
-            // make the current seed node colored and rectangular
-            MutableNode gSeed = gNodes.get(seed);
-            gSeed.add(c, Style.FILLED, Shape.RECTANGLE);
-            if (name.contains("2018_10")) // todo debug
-                Utils.print("seed: " + gSeed);
+                // make the current seed node colored and rectangular
+                MutableNode gSeed = gNodes.get(seed);
+                gSeed.add(c, Style.FILLED, Shape.RECTANGLE);
 
-            // make the nodes infected by the current seed colored with the same color
-            infected.forEach(infNode -> {
-                MutableNode gInfNode = gNodes.get(infNode);
-                gInfNode.add(c, Style.FILLED);
-                if (name.contains("2018_10")) // todo debug
-                    Utils.print("infected: " + gInfNode);
+                // make the nodes infected by the current seed colored with the same color
+                infected.forEach(infNode -> {
+                    MutableNode gInfNode = gNodes.get(infNode);
+                    gInfNode.add(c, Style.FILLED);
+                });
             });
-        });
+        } catch (ClassCastException ex1) {
+            try {
+                Map<Set<String>, Set<String>> nodes2 = (Map<Set<String>, Set<String>>) nodes;
+                nodes2.forEach((seeds, infected) -> {
+                    Color c = Utils.getRandColor();
+
+                    // make the current seed node colored and rectangular
+                    seeds.forEach(seed -> {
+                        MutableNode gSeed = gNodes.get(seed);
+                        gSeed.add(c, Style.FILLED, Shape.RECTANGLE);
+                    });
+
+                    // make the nodes infected by the current seed colored with the same color
+                    infected.forEach(infNode -> {
+                        MutableNode gInfNode = gNodes.get(infNode);
+                        gInfNode.add(c, Style.FILLED);
+                    });
+                });
+            } catch (ClassCastException ex2) {
+                throw new IllegalArgumentException("The parameter nodes should be a map of type Map<String, Set<String>> or Map<Set<String>, Set<String>>");
+            }
+        }
 
         File imgFile = Utils.getNewFile(path, name, "svg");
 //        Utils.print(imgFile.getParentFile().exists());

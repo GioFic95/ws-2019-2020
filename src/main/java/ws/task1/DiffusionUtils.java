@@ -1,7 +1,13 @@
 package ws.task1;
 
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import com.univocity.parsers.common.IterableResult;
+import com.univocity.parsers.common.ParsingContext;
+import com.univocity.parsers.common.record.Record;
 import org.jgrapht.Graph;
 import org.jgrapht.io.ImportException;
+import ws.Main;
 import ws.Utils;
 import ws.myGraph.GraphUtils;
 import ws.myGraph.MyEdgeDS1;
@@ -11,7 +17,9 @@ import ws.weights.PageRankWeight;
 import ws.weights.SimpleWeight;
 import ws.weights.Weight;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -81,5 +89,102 @@ public class DiffusionUtils {
         Set<String> s = new HashSet<>(s1);
         s.addAll(s2);
         return s;
+    }
+
+    /**
+     * If {@param filename} is null or empty string, the last independent cascade unified log is used
+     * (as produced by {@link Task1#writeUnifiedSpreadInfluence(String)}).
+     * @param fileNamePattern todo
+     * @param dirName todo
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static void drawSpreadInfluence(String fileNamePattern, String dirName) throws URISyntaxException, IOException {
+        // Prepare the output dir and file
+        String pathName = dirName == null || dirName.equals("") ? "ic" : "ic_" + dirName;
+        String fileName;
+        File dir = new File(Main.class.getResource("plots").toURI().getPath() + "\\" + pathName);
+        if (! dir.isDirectory()) {
+            if (!dir.mkdir()) {
+                Utils.print("the directory " + dirName + "does not exist and can't be created.");
+            }
+        }
+        if (fileNamePattern == null || fileNamePattern.equals("")) {
+            fileName = Utils.findLastLog("ic_results__.*\\.txt");
+        } else {
+            fileName = Utils.findLastLog(fileNamePattern);
+        }
+
+        IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "numSeeds", "infectedNodes"}, "logs/" + fileName);
+        Type type = new TypeToken<Map<MyVertex, Set<MyVertex>>>(){}.getType();
+        for (Record row : ir) {
+            String year = row.getString("year");
+            String numSeeds = row.getString("numSeeds");
+            String infectedNodesJson = row.getString("infectedNodes");
+            Map<MyVertex, Set<MyVertex>> infectedNodes;
+            try {
+                infectedNodes = MyVertex.getGson().fromJson(infectedNodesJson, type);
+            } catch (JsonSyntaxException ex) {
+                Utils.print("Can't parse string '" + infectedNodesJson + "' as json.");
+                continue;
+            }
+            Map<String, Set<String>> infectedNodesIds = infectedNodes.entrySet().stream().collect(Collectors.toMap(
+                    myVertexSetEntry -> myVertexSetEntry.getKey().getId(),
+                    myVertexSetEntry -> myVertexSetEntry.getValue().stream().map(MyVertex::getId).collect(Collectors.toSet())
+            ));
+            String outName = year + "_" + numSeeds;
+            Utils.print("writing graph '" + outName + "' in dir 'plots/" + pathName + "'");
+            File file = Utils.getNewFile("graphs/ds1", year, "dot");
+            GraphUtils.writeImage(file, "plots/" + pathName, outName, infectedNodesIds);
+        }
+    }
+
+    /**
+     * If {@param filename} is null or empty string, the last independent cascade merge log is used
+     * (as produced by {@link Task1#mergeSpreadInfluenceResults(int, double)}).
+     * @param fileNamePattern todo
+     * @param dirName todo
+     * @throws URISyntaxException
+     * @throws IOException
+     */
+    public static void drawMerge(String fileNamePattern, String dirName) throws URISyntaxException, IOException {
+        // Prepare the output dir and file
+        String pathName = dirName == null || dirName.equals("") ? "ic" : "ic_" + dirName;
+        String fileName;
+        File dir = new File(Main.class.getResource("plots").toURI().getPath() + "\\" + pathName);
+        if (! dir.isDirectory()) {
+            if (!dir.mkdir()) {
+                Utils.print("the directory " + dirName + "does not exist and can't be created.");
+            }
+        }
+        if (fileNamePattern == null || fileNamePattern.equals("")) {
+            fileName = Utils.findLastLog("ic_results_merged2__.*\\.txt");
+        } else {
+            fileName = Utils.findLastLog(fileNamePattern);
+        }
+
+        IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "numSeeds", "infectedNodes"}, "logs/" + fileName);
+        Type type = new TypeToken<Map<Set<MyVertex>, Set<MyVertex>>>(){}.getType();
+        for (Record row : ir) {
+            String year = row.getString("year");
+            String numSeeds = row.getString("numSeeds");
+            String infectedNodesJson = row.getString("infectedNodes");
+            Map<Set<MyVertex>, Set<MyVertex>> infectedNodes;
+            try {
+                infectedNodes = MyVertex.getGson().fromJson(infectedNodesJson, type);
+            } catch (JsonSyntaxException ex) {
+                Utils.print("Can't parse string '" + infectedNodesJson + "' as json.");
+                continue;
+            }
+            Map<Set<String>, Set<String>> infectedNodesIds = infectedNodes.entrySet().stream().collect(Collectors.toMap(
+                    myVertexSetEntry -> myVertexSetEntry.getKey().stream().map(MyVertex::getId).collect(Collectors.toSet()),
+                    myVertexSetEntry -> myVertexSetEntry.getValue().stream().map(MyVertex::getId).collect(Collectors.toSet())
+            ));
+            Utils.print("infectedNodesIds" + infectedNodesIds);
+            String outName = year + "_" + numSeeds;
+            Utils.print("writing graph '" + outName + "' in dir 'plots/" + pathName + "'");
+            File file = Utils.getNewFile("graphs/ds1", year, "dot");
+            GraphUtils.writeImage(file, "plots/" + pathName, outName, infectedNodesIds);
+        }
     }
 }
