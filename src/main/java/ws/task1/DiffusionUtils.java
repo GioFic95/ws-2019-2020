@@ -162,6 +162,7 @@ public class DiffusionUtils {
         } else {
             fileName = Utils.findLastLog(fileNamePattern);
         }
+        Utils.print("file name: " + fileName);
 
         IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "numSeeds", "infectedNodes"}, "logs/" + fileName);
         Type type = new TypeToken<Map<Set<MyVertex>, Set<MyVertex>>>(){}.getType();

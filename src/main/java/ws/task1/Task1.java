@@ -29,6 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -264,7 +265,7 @@ public class Task1 {
      * Merge the last {@param n} independent cascade results.
      * @param n
      */
-    public static void mergeSpreadInfluenceResults(int n, double threshold) throws URISyntaxException, IOException {
+    public static void mergeSpreadInfluenceResults(int n, double threshold, double ratio) throws URISyntaxException, IOException {
         Type type1 = new TypeToken<Map<MyVertex, Set<MyVertex>>>() {}.getType();
         Type type2 = new TypeToken<Map<Set<MyVertex>, Set<MyVertex>>>() {}.getType();
         List<String> fileNames = Utils.findLastLogs("ic_results__[0-9].*\\.txt", n);
@@ -294,28 +295,28 @@ public class Task1 {
             List<Map<MyVertex, Set<MyVertex>>> infectedNodes = new ArrayList<>();
             currentRows.forEach(row -> infectedNodes.add(MyVertex.getGson().fromJson(row.getString("infectedNodes"), type1)));
 
-            // *** PHASE 1: add to a topic each keyword that is infected at least in ONE?? simulation ***
-            // todo basta 1 simulazione o 1/3? 2/3?
-            /* infectedNodes.forEach(
-                    myVertexSetMap -> myVertexSetMap.forEach(
-                            (seed, infected) -> infectedNodesMerged.merge(seed, infected,
-                                    (BiFunction<Set<MyVertex>, Set<MyVertex>, Set<MyVertex>>) (myVertices, myVertices2) -> {
-                                        myVertices.addAll(myVertices2);
-                                        return myVertices;
-                            }))); */
-
+            // *** PHASE 1: add to a topic each keyword that is infected at least in 1/3rd of the simulations ***
             Map<MyVertex, Map<MyVertex, Integer>> counter = new HashMap<>();
             infectedNodes.forEach(
                     myVertexSetMap -> myVertexSetMap.forEach(
-                            (seed, infected) -> infected.forEach(
-                                    node -> counter.merge(seed, Map.of(node, 1),
-                                            (BiFunction<Map<MyVertex, Integer>, Map<MyVertex, Integer>, Map<MyVertex, Integer>>)
-                                                    (myVertexIntegerMap1, myVertexIntegerMap2) -> {
-                                                        Map<MyVertex, Integer> map = new HashMap<>(myVertexIntegerMap1);
-                                                        myVertexIntegerMap2.forEach((k,v) -> map.merge(k, v, Integer::sum));
-                                                        return map;
-                                    }))));
+                            (seed, infected) -> {
+                                if (infected.isEmpty()) {
+                                    counter.put(seed, Map.of());
+                                } else {
+                                    infected.forEach(
+                                        node -> counter.merge(seed, Map.of(node, 1),
+                                                (myVertexIntegerMap1, myVertexIntegerMap2) -> {
+                                                    Map<MyVertex, Integer> map = new HashMap<>(myVertexIntegerMap1);
+                                                    myVertexIntegerMap2.forEach((k, v) -> map.merge(k, v, Integer::sum));
+                                                    return map;
+                                                }));
+                                }}));
             Utils.print("counter: " + counter);
+
+            counter.forEach((k, v) -> infectedNodesMerged.put(k, v.entrySet().stream()
+                    .filter(entry -> entry.getValue() >= n*ratio)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet())));
 
             // Add the current record to the output file, first phase of merge
             String name = year + "_" + seedNum;
@@ -323,16 +324,6 @@ public class Task1 {
             String infectedNodesMergedJson = MyVertex.getGson().toJson(infectedNodesMerged, type1);
             sb1.append(year).append("\t").append(seedNum).append("\t").append(infectedNodesMergedJson).append("\n");
 
-            // Look for nodes that appear in more sets   todo è un passaggio inutile, si può togliere
-            Map<MyVertex, Integer> counter1 = new HashMap<>();
-            for (Set<MyVertex> set : infectedNodesMerged.values()) {
-                set.forEach(mv -> counter1.merge(mv, 1, Integer::sum));
-            }
-            Set<MyVertex> intersection = counter1.entrySet().stream().filter(entry -> entry.getValue() > 1).map(Map.Entry::getKey).collect(Collectors.toSet());
-            Utils.print("These nodes appear in more sets: " + intersection);
-
-
-            // todo fare merge con similarità tra topic, eventualmente con parole singole
             // *** PHASE 2: merge similar topics ***
             // compute similarities
             Map<UnorderedPair<MyVertex, MyVertex>, Double> similarities = new HashMap<>();
@@ -363,7 +354,6 @@ public class Task1 {
                 MyVertex v2 = set1.getSecond();
                 Set<MyVertex> currGroup = new HashSet<>();
 
-                // todo decidere se, dati due insiemi simili A e B, basta che un terzo insieme C sia simile ad uno tra A e B o debba essere simile a entrambi per essere aggiunto al gruppo
                 Set<UnorderedPair<MyVertex, MyVertex>> tempSim = similarSets.stream()
                         .filter(entry -> entry.hasElement(v1) || entry.hasElement(v2))
                         .collect(Collectors.toSet());
@@ -396,6 +386,8 @@ public class Task1 {
             Utils.print("writing graph " + name + ", phase 2");
             infectedNodesMergedJson = MyVertex.getGson().toJson(infectedNodesMerged2, type2);
             sb2.append(year).append("\t").append(seedNum).append("\t").append(infectedNodesMergedJson).append("\n");
+
+            Utils.print("infectedNodes avg len: " + infectedNodes.stream().mapToInt(Map::size).average().getAsDouble() + ", counter len: " + counter.size() + ", infectedNodesMerged len: " + infectedNodesMerged.size() + ", infectedNodesMerged2 len: " + infectedNodesMerged2.size());
         }
 
         // Write the merged independent cascade log
@@ -403,7 +395,8 @@ public class Task1 {
         Utils.writeLog(sb2, "ic_results_merged2");
     }
 
-    public static void multipleIndependentCascadeFlow(int n, double k, double threshold, boolean doSimulations, String name) throws ImportException, IOException, URISyntaxException {
+    public static void multipleIndependentCascadeFlow(int n, double k, double threshold, double ratio, boolean doSimulations, String name)
+            throws ImportException, IOException, URISyntaxException {
         if (doSimulations) {
             for (int i = 1; i <= n; i++) {
                 spreadInfluence("alp_prw__.*\\.txt", k);
@@ -411,7 +404,7 @@ public class Task1 {
                 DiffusionUtils.drawSpreadInfluence("", name + i);
             }
         }
-        mergeSpreadInfluenceResults(n, threshold);
+        mergeSpreadInfluenceResults(n, threshold, ratio);
         DiffusionUtils.drawSpreadInfluence("ic_results_merged1.*\\.txt", name + "merge1");
         DiffusionUtils.drawMerge("ic_results_merged2.*\\.txt", name + "merge2");
     }
