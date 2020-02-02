@@ -27,9 +27,6 @@ import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -265,7 +262,7 @@ public class Task1 {
      * Merge the last {@param n} independent cascade results.
      * @param n
      */
-    public static void mergeSpreadInfluenceResults(int n, double threshold, double ratio) throws URISyntaxException, IOException {
+    public static void mergeSpreadInfluenceResults(int n, double ratio, double threshold) throws URISyntaxException, IOException {
         Type type1 = new TypeToken<Map<MyVertex, Set<MyVertex>>>() {}.getType();
         Type type2 = new TypeToken<Map<Set<MyVertex>, Set<MyVertex>>>() {}.getType();
         List<String> fileNames = Utils.findLastLogs("ic_results__[0-9].*\\.txt", n);
@@ -395,7 +392,7 @@ public class Task1 {
         Utils.writeLog(sb2, "ic_results_merged2");
     }
 
-    public static void multipleIndependentCascadeFlow(int n, double k, double threshold, double ratio, boolean doSimulations, String name)
+    public static void multipleIndependentCascadeFlow(int n, double k, double ratio, double threshold, boolean doSimulations, String name)
             throws ImportException, IOException, URISyntaxException {
         if (doSimulations) {
             for (int i = 1; i <= n; i++) {
@@ -404,7 +401,7 @@ public class Task1 {
                 DiffusionUtils.drawSpreadInfluence("", name + i);
             }
         }
-        mergeSpreadInfluenceResults(n, threshold, ratio);
+        mergeSpreadInfluenceResults(n, ratio, threshold);
         DiffusionUtils.drawSpreadInfluence("ic_results_merged1.*\\.txt", name + "merge1");
         DiffusionUtils.drawMerge("ic_results_merged2.*\\.txt", name + "merge2");
     }

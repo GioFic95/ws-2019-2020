@@ -14,8 +14,6 @@ import ws.task1.Task1;
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 public class Main {
@@ -56,24 +54,26 @@ public class Main {
      * @throws ImportException if raised by {@link Task1#tryMeasures()}.
      */
     public static void main(String... args) throws ExportException, IOException, URISyntaxException, TransformerException, ImportException {
-        Utils.printNow();
+        /*Utils.printNow();
         preprocessing();
         Utils.printNow();
         Task1.tryMeasures();
         Utils.printNow();
-        Task1.multipleIndependentCascadeFlow(30, 1.5, 0.5, 0.3, true, "15_");
+        Task1.multipleIndependentCascadeFlow(30, 1.5, 0.3, 0.5, true, "15_");
         Utils.printNow();
-        Task1.multipleIndependentCascadeFlow(30, 1, 0.5, 0.3, true, "1_");
+        Task1.multipleIndependentCascadeFlow(30, 1, 0.3, 0.5, true, "1_");
         Utils.printNow();
-        Task1.multipleIndependentCascadeFlow(30, 1, 0.7, 0.3, false, "2_");
+        Task1.multipleIndependentCascadeFlow(30, 1, 0.3, 0.7, false, "2_");
         Utils.printNow();
-        Task1.multipleIndependentCascadeFlow(30, 1, 0.8, 0.3, false, "4_");
+        Task1.multipleIndependentCascadeFlow(30, 1, 0.3, 0.8, false, "4_");
         Utils.printNow();
-        Task1.multipleIndependentCascadeFlow(30, 1, 0.8, 0.3, false, "5_");
+        Task1.multipleIndependentCascadeFlow(30, 1, 0.3, 0.8, false, "5_");
         Utils.printNow();
-        Task1.multipleIndependentCascadeFlow(30, 1, 0.8, 0.2, false, "6_");
+        Task1.multipleIndependentCascadeFlow(30, 1, 0.2, 0.8, false, "6_");
         Utils.printNow();
-        Task1.multipleIndependentCascadeFlow(30, 1, 0.7, 0.2, false, "7_");
+        Task1.multipleIndependentCascadeFlow(30, 1, 0.2, 0.7, false, "7_");*/
+        Utils.printNow();
+        Task1.multipleIndependentCascadeFlow(30, 2, 0.1, 0.4, false, "8_");
         Utils.printNow();
     }
 }
