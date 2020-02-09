@@ -30,10 +30,10 @@ public class Prova {
 //            e.printStackTrace();
 //        }
 
-        MyVertex v1 = new MyVertex("v1");
-        MyVertex v2 = new MyVertex("v2");
-        MyVertex v3 = new MyVertex("v3");
-        MyVertex v4 = new MyVertex("v4");
+//        MyVertex v1 = new MyVertex("v1");
+//        MyVertex v2 = new MyVertex("v2");
+//        MyVertex v3 = new MyVertex("v3");
+//        MyVertex v4 = new MyVertex("v4");
 //        Set<MyVertex> s = new HashSet<>();
 //        s.add(v1);
 //        s.add(v2);
@@ -72,7 +72,7 @@ public class Prova {
 //        String max = Collections.max(dates, Comparator.naturalOrder());
 //        Utils.print(max);
 
-        Map<String, Integer> map = new HashMap<>();
+        /*Map<String, Integer> map = new HashMap<>();
         map.put("uno1", 1);
         map.put("due22", 2);
         map.put("tre333", 3);
@@ -93,7 +93,7 @@ public class Prova {
             if (integer != null)
                 return integer+1;
             else return 1;
-        }));
+        }));*/
 
         /*Utils.print(map);
         Map<Integer, String> map3 = map.entrySet().stream().collect(Collectors.toMap(
@@ -106,7 +106,7 @@ public class Prova {
         Map<Integer, String> obj = new Gson().fromJson(s, type);
         Utils.print(obj);*/
 
-        Utils.print(map);
+/*        Utils.print(map);
         Utils.print("merge " + map.merge("quattro", 1, Integer::sum));
         Utils.print(map);
         Utils.print("merge " + map.merge("cinquemila", 1, Integer::sum));
@@ -124,6 +124,22 @@ public class Prova {
         for (MyVertex mv : mvs) {
             map4.merge(mv, 1, Integer::sum);
         }
-        Utils.print(map4);
+        Utils.print(map4);*/
+
+        /*Set<String> s = new HashSet<>(Arrays.asList("a", "b", "c"));
+        Iterator<String> it = s.iterator();
+        it.forEachRemaining(ss -> {
+            Utils.print(ss);
+            it.remove();
+        });
+        Utils.print(s);*/
+
+        Map<String, Integer> mmm = new HashMap<>(Map.of("1", 1, "2", 2, "3", 3));
+        mmm.merge("2", 5, (integer, integer2) -> {
+            Utils.print(integer);
+            Utils.print(integer2);
+            return integer*integer2;
+        });
+        Utils.print(mmm);
     }
 }

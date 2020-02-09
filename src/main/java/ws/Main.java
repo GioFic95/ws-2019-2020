@@ -54,12 +54,12 @@ public class Main {
      * @throws ImportException if raised by {@link Task1#tryMeasures()}.
      */
     public static void main(String... args) throws ExportException, IOException, URISyntaxException, TransformerException, ImportException {
-        /*Utils.printNow();
-        preprocessing();
-        Utils.printNow();
-        Task1.tryMeasures();
-        Utils.printNow();
-        Task1.multipleIndependentCascadeFlow(30, 1.5, 0.3, 0.5, true, "15_");
+//        Utils.printNow();
+//        preprocessing();
+//        Utils.printNow();
+//        Task1.tryMeasures();
+//        Utils.printNow();
+        /*Task1.multipleIndependentCascadeFlow(30, 1.5, 0.3, 0.5, true, "15_");
         Utils.printNow();
         Task1.multipleIndependentCascadeFlow(30, 1, 0.3, 0.5, true, "1_");
         Utils.printNow();
@@ -75,5 +75,6 @@ public class Main {
         Utils.printNow();
         Task1.multipleIndependentCascadeFlow(30, 2, 0.1, 0.4, false, "8_");
         Utils.printNow();
+
     }
 }

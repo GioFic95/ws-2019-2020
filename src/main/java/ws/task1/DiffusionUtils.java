@@ -141,14 +141,14 @@ public class DiffusionUtils {
 
     /**
      * If {@param filename} is null or empty string, the last independent cascade merge log is used
-     * (as produced by {@link Task1#mergeSpreadInfluenceResults(int, double)}).
+     * (as produced by {@link Task1#mergeSpreadInfluenceResults(int, double, double)}).
      * @param fileNamePattern todo
      * @param dirName todo
      * @throws URISyntaxException
      * @throws IOException
      */
     public static void drawMerge(String fileNamePattern, String dirName) throws URISyntaxException, IOException {
-        // Prepare the output dir and file
+        // Prepare the output dir and input file
         String pathName = dirName == null || dirName.equals("") ? "ic" : "ic_" + dirName;
         String fileName;
         File dir = new File(Main.class.getResource("plots").toURI().getPath() + "\\" + pathName);
