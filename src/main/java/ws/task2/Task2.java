@@ -8,13 +8,14 @@ import com.univocity.parsers.common.record.Record;
 import ws.Utils;
 import ws.myGraph.MyVertex;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Task2 {
-    public static void traceTopics(String fileNamePattern, double threshold) throws URISyntaxException {
+    public static void traceTopics(String fileNamePattern, double threshold) throws URISyntaxException, IOException {
         String fileName;
         if (fileNamePattern == null || fileNamePattern.equals("")) {
             fileName = Utils.findLastLog("ic_results_merged2__.*\\.txt");
@@ -25,15 +26,31 @@ public class Task2 {
 
         IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "numSeeds", "infectedNodes"}, "logs/" + fileName);
         Type type = new TypeToken<Map<Set<MyVertex>, Set<MyVertex>>>(){}.getType();
-        Map<String, Map<String, Set<Set<String>>>> data = new TreeMap<>();
+        Map<Integer, Map<Integer, Set<Set<String>>>> data = new TreeMap<>();
+        StringBuilder sb = new StringBuilder();
+        int lastNumSeeds = 0;
 
         // read merge output log
         for (Record row : ir) {
-            String year = row.getString("year");
-            String numSeeds = row.getString("numSeeds");
+            String yearJson = row.getString("year");
+            int year;
+            String numSeedJson = row.getString("numSeeds");
+            int numSeeds;
             String infectedNodesJson = row.getString("infectedNodes");
             Map<Set<MyVertex>, Set<MyVertex>> infectedNodes;
             Set<Set<String>> topics = new HashSet<>();
+            try {
+                year = Integer.parseInt(yearJson);
+            } catch (NumberFormatException ex) {
+                Utils.print("Can't parse string '" + yearJson + "' as Integer.");
+                continue;
+            }
+            try {
+                numSeeds = Integer.parseInt(numSeedJson);
+            } catch (NumberFormatException ex) {
+                Utils.print("Can't parse string '" + numSeedJson + "' as Integer.");
+                continue;
+            }
             try {
                 infectedNodes = MyVertex.getGson().fromJson(infectedNodesJson, type);
             } catch (JsonSyntaxException ex) {
@@ -46,9 +63,19 @@ public class Task2 {
                 topics.add(topic);
             });
 
+            if (20 < numSeeds && numSeeds < 100) {
+                numSeeds = 100;
+            } else if (10 < numSeeds && numSeeds < 20) {
+                if (lastNumSeeds == 20) {
+                    numSeeds = 100;
+                } else {
+                    numSeeds = 20;
+                }
+            }
+
             // populate data
             data.merge(numSeeds, Map.of(year, topics), (oldMap, newMap) -> {
-                Map<String, Set<Set<String>>> resMap = Map.copyOf(oldMap);
+                Map<Integer, Set<Set<String>>> resMap = new TreeMap<>(oldMap);
                 resMap.merge(year, topics, (oldSet, newSet) -> {
                     Set<Set<String>> resSet = new HashSet<>(oldSet);
                     resSet.addAll(newSet);
@@ -56,19 +83,20 @@ public class Task2 {
                 });
                 return resMap;
             });
+
+            lastNumSeeds = numSeeds;
         }
 
-        // todo (i print devono diventare write)
         // trace topics among years
         data.forEach((numSeed, years) -> {
-            Utils.print(numSeed + "\n");
+            sb.append(numSeed + "\n");
             years.forEach((year1, topics1) -> {
                 Iterator<Set<String>> topics1it = topics1.iterator();
                 topics1it.forEachRemaining(topic1 -> {
-                    Utils.print("\n" + topic1 + " (" + year1 + ")");
+                    sb.append("\n" + topic1 + " (" + year1 + ")");
                     topics1it.remove();
                     years.forEach((year2, topics2) -> {
-                        if (year2.compareTo(year1) > 0) {
+                        if (year2 > year1) {
                             Map<Set<String>, Double> similarities = new HashMap<>();
                             topics2.forEach(topic2 -> {
                                 Set<String> intersect = new HashSet<>(topic1);
@@ -81,14 +109,15 @@ public class Task2 {
                             Optional<Map.Entry<Set<String>, Double>> nextTopicOpt = similarities.entrySet().stream().max(Comparator.comparing(Map.Entry::getValue));
                             if (nextTopicOpt.isPresent()) {
                                 Set<String> nextTopic = nextTopicOpt.get().getKey();
-                                Utils.print(" --> " + nextTopic + " (" + year2 + ")");
+                                sb.append(" --> " + nextTopic + " (" + year2 + ")");
                                 topics2.remove(nextTopic);
                             }
                         }
                     });
                 });
             });
-            Utils.print("\n\n\n");
+            sb.append("\n\n\n");
         });
+        Utils.writeLog(sb, "topic_tracing");
     }
 }

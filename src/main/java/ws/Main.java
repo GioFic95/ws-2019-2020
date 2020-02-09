@@ -10,6 +10,7 @@ import org.jgrapht.io.ImportException;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
 import ws.task1.Task1;
+import ws.task2.Task2;
 
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
@@ -72,9 +73,10 @@ public class Main {
         Task1.multipleIndependentCascadeFlow(30, 1, 0.2, 0.8, false, "6_");
         Utils.printNow();
         Task1.multipleIndependentCascadeFlow(30, 1, 0.2, 0.7, false, "7_");*/
+//        Utils.printNow();
+//        Task1.multipleIndependentCascadeFlow(30, 2, 0.1, 0.4, false, "8_");
         Utils.printNow();
-        Task1.multipleIndependentCascadeFlow(30, 2, 0.1, 0.4, false, "8_");
+        Task2.traceTopics("", 0.7);
         Utils.printNow();
-
     }
 }
