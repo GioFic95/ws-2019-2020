@@ -1,0 +1,241 @@
+
+ *** SIMPLE SCORES *** 
+
+.\simple_weight_alp_prw.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055405
+.\simple_weight_alp_prw_unb.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055405
+.\simple_weight_alp_weighted.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055408
+.\simple_weight_bet_prw.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055405
+.\simple_weight_bet_prw_unb.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055405
+.\simple_weight_bet_weighted.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055408
+.\simple_weight_clo_prw.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055405
+.\simple_weight_clo_prw_unb.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055405
+.\simple_weight_clo_weighted.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055408
+.\simple_weight_clu_prw.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055405
+.\simple_weight_clu_prw_unb.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055405
+.\simple_weight_clu_weighted.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055408
+.\simple_weight_pag_prw.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055405
+.\simple_weight_pag_prw_unb.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055405
+.\simple_weight_pag_weighted.txt		--> min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055408
+
+
+ *** PAGE RANK SCORES *** 
+
+.\page_rank_alp_pr.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054979
+.\page_rank_alp_prw.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054976
+.\page_rank_alp_prw_unb.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054976
+.\page_rank_bet_pr.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054979
+.\page_rank_bet_prw.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054976
+.\page_rank_bet_prw_unb.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054976
+.\page_rank_clo_pr.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054979
+.\page_rank_clo_prw.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054976
+.\page_rank_clo_prw_unb.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054976
+.\page_rank_clu_pr.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054979
+.\page_rank_clu_prw.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054976
+.\page_rank_clu_prw_unb.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054976
+.\page_rank_pag_pr.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054979
+.\page_rank_pag_prw.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054976
+.\page_rank_pag_prw_unb.txt		--> min-max: (0.0, 1.0), mean: 0.164088, var: 0.054976
+
+
+ *** COMBINED SCORING *** 
+
+
+.\scoring_alp_pr.txt:
+centrality scores:		min-max: (1.0101010005263158, 1.7634158923936902), mean: 1.061245, var: 0.004244
+normalized scores:		min-max: (0.5728092927244021, 1.0), mean: 0.779220, var: 0.017101
+weight scores:			min-max: (0.0, 1.0), mean: 0.164088, var: 0.054979
+combined scores:		min-max: (0.28640464636220103, 1.0), mean: 0.471654, var: 0.026483
+
+.\scoring_alp_prw.txt:
+centrality scores:		min-max: (1.0101010005263158, 1.7634158923936902), mean: 1.061245, var: 0.004244
+normalized scores:		min-max: (0.5728092927244021, 1.0), mean: 0.779220, var: 0.017101
+weight scores:			min-max: (0.0026041666666666665, 1.0), mean: 0.171390, var: 0.053407
+combined scores:		min-max: (0.28770672969553435, 1.0), mean: 0.475305, var: 0.026698
+
+.\scoring_alp_prw_mul.txt:
+centrality scores:		min-max: (1.0101010005263158, 1.7634158923936902), mean: 1.061245, var: 0.004244
+normalized scores:		min-max: (0.5728092927244021, 1.0), mean: 0.779220, var: 0.017101
+weight scores:			min-max: (0.0026041666666666665, 1.0), mean: 0.171390, var: 0.053407
+combined scores:		min-max: (0.001491690866469797, 1.0), mean: 0.151691, var: 0.050331
+
+.\scoring_alp_prw_unb.txt:
+centrality scores:		min-max: (1.0101010005263158, 1.7634158923936902), mean: 1.061245, var: 0.004244
+normalized scores:		min-max: (0.5728092927244021, 1.0), mean: 0.779220, var: 0.017101
+weight scores:			min-max: (0.0015624999999999999, 1.0), mean: 0.168470, var: 0.053607
+combined scores:		min-max: (0.40143525490708143, 1.0), mean: 0.595995, var: 0.020619
+
+.\scoring_alp_prw_unb_mul.txt:
+centrality scores:		min-max: (1.0101010005263158, 1.7634158923936902), mean: 1.061245, var: 0.004244
+normalized scores:		min-max: (0.5728092927244021, 1.0), mean: 0.779220, var: 0.017101
+weight scores:			min-max: (0.0015624999999999999, 1.0), mean: 0.168470, var: 0.053607
+combined scores:		min-max: (0.0008950145198818782, 1.0), mean: 0.148928, var: 0.050214
+
+.\scoring_alp_simple.txt:
+centrality scores:		min-max: (1.0101010005263158, 1.7634158923936902), mean: 1.061245, var: 0.004244
+normalized scores:		min-max: (0.5728092927244021, 1.0), mean: 0.779220, var: 0.017101
+
+.\scoring_alp_weighted.txt:
+centrality scores:		min-max: (1.0101010005263158, 1.7634158923936902), mean: 1.061245, var: 0.004244
+normalized scores:		min-max: (0.5728092927244021, 1.0), mean: 0.779220, var: 0.017101
+weight scores:			min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055408
+combined scores:		min-max: (0.2890088130288677, 1.0), mean: 0.478956, var: 0.027807
+
+.\scoring_bet_pr.txt:
+centrality scores:		min-max: (0.0, 6279.596802723539), mean: 55.000918, var: 114701.085796
+normalized scores:		min-max: (0.0, 1.0), mean: 0.031486, var: 0.017462
+weight scores:			min-max: (0.0, 1.0), mean: 0.164088, var: 0.054979
+combined scores:		min-max: (0.0, 1.0), mean: 0.095874, var: 0.022486
+
+.\scoring_bet_prw.txt:
+centrality scores:		min-max: (0.0, 6279.596802723539), mean: 55.000918, var: 114701.085796
+normalized scores:		min-max: (0.0, 1.0), mean: 0.031486, var: 0.017462
+weight scores:			min-max: (0.0026041666666666665, 1.0), mean: 0.171390, var: 0.053407
+combined scores:		min-max: (0.0013020833333333333, 1.0), mean: 0.099152, var: 0.022008
+
+.\scoring_bet_prw_mul.txt:
+centrality scores:		min-max: (0.0, 6279.596802723539), mean: 55.000918, var: 114701.085796
+normalized scores:		min-max: (0.0, 1.0), mean: 0.031486, var: 0.017462
+weight scores:			min-max: (0.0026041666666666665, 1.0), mean: 0.171390, var: 0.053407
+combined scores:		min-max: (0.0, 1.0), mean: 0.015044, var: 0.007512
+
+.\scoring_bet_prw_unb.txt:
+centrality scores:		min-max: (0.0, 6279.596802723539), mean: 55.000918, var: 114701.085796
+normalized scores:		min-max: (0.0, 1.0), mean: 0.031486, var: 0.017462
+weight scores:			min-max: (0.0015624999999999999, 1.0), mean: 0.168470, var: 0.053607
+combined scores:		min-max: (0.00046874999999999993, 1.0), mean: 0.071299, var: 0.017303
+
+.\scoring_bet_prw_unb_mul.txt:
+centrality scores:		min-max: (0.0, 6279.596802723539), mean: 55.000918, var: 114701.085796
+normalized scores:		min-max: (0.0, 1.0), mean: 0.031486, var: 0.017462
+weight scores:			min-max: (0.0015624999999999999, 1.0), mean: 0.168470, var: 0.053607
+combined scores:		min-max: (0.0, 1.0), mean: 0.015006, var: 0.007524
+
+.\scoring_bet_simple.txt:
+centrality scores:		min-max: (0.0, 6279.596802723539), mean: 55.000918, var: 114701.085796
+normalized scores:		min-max: (0.0, 1.0), mean: 0.031486, var: 0.017462
+
+.\scoring_bet_weighted.txt:
+centrality scores:		min-max: (0.0, 6279.596802723539), mean: 55.000918, var: 114701.085796
+normalized scores:		min-max: (0.0, 1.0), mean: 0.031486, var: 0.017462
+weight scores:			min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055408
+combined scores:		min-max: (0.002544529262086514, 1.0), mean: 0.102430, var: 0.022338
+
+.\scoring_clo_pr.txt:
+centrality scores:		min-max: (0.0035971223021582736, 0.47121212121212086), mean: 0.128113, var: 0.010194
+normalized scores:		min-max: (0.00865176640230715, 1.0), mean: 0.406476, var: 0.082744
+weight scores:			min-max: (0.0, 1.0), mean: 0.164088, var: 0.054979
+combined scores:		min-max: (0.004823151125401932, 1.0), mean: 0.285282, var: 0.048744
+
+.\scoring_clo_prw.txt:
+centrality scores:		min-max: (0.0035971223021582736, 0.47121212121212086), mean: 0.128113, var: 0.010194
+normalized scores:		min-max: (0.00865176640230715, 1.0), mean: 0.406476, var: 0.082744
+weight scores:			min-max: (0.0026041666666666665, 1.0), mean: 0.171390, var: 0.053407
+combined scores:		min-max: (0.006125234458735265, 1.0), mean: 0.288933, var: 0.049473
+
+.\scoring_clo_prw_mul.txt:
+centrality scores:		min-max: (0.0035971223021582736, 0.47121212121212086), mean: 0.128113, var: 0.010194
+normalized scores:		min-max: (0.00865176640230715, 1.0), mean: 0.406476, var: 0.082744
+weight scores:			min-max: (0.0026041666666666665, 1.0), mean: 0.171390, var: 0.053407
+combined scores:		min-max: (2.512057877813506e-05, 1.0), mean: 0.100533, var: 0.034149
+
+.\scoring_clo_prw_unb.txt:
+centrality scores:		min-max: (0.0035971223021582736, 0.47121212121212086), mean: 0.128113, var: 0.010194
+normalized scores:		min-max: (0.00865176640230715, 1.0), mean: 0.406476, var: 0.082744
+weight scores:			min-max: (0.0015624999999999999, 1.0), mean: 0.168470, var: 0.053607
+combined scores:		min-max: (0.007127009011662037, 1.0), mean: 0.335074, var: 0.057958
+
+.\scoring_clo_prw_unb_mul.txt:
+centrality scores:		min-max: (0.0035971223021582736, 0.47121212121212086), mean: 0.128113, var: 0.010194
+normalized scores:		min-max: (0.00865176640230715, 1.0), mean: 0.406476, var: 0.082744
+weight scores:			min-max: (0.0015624999999999999, 1.0), mean: 0.168470, var: 0.053607
+combined scores:		min-max: (1.5072347266881037e-05, 1.0), mean: 0.098448, var: 0.033570
+
+.\scoring_clo_simple.txt:
+centrality scores:		min-max: (0.0035971223021582736, 0.47121212121212086), mean: 0.128113, var: 0.010194
+normalized scores:		min-max: (0.00865176640230715, 1.0), mean: 0.406476, var: 0.082744
+
+.\scoring_clo_weighted.txt:
+centrality scores:		min-max: (0.0035971223021582736, 0.47121212121212086), mean: 0.128113, var: 0.010194
+normalized scores:		min-max: (0.00865176640230715, 1.0), mean: 0.406476, var: 0.082744
+weight scores:			min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055408
+combined scores:		min-max: (0.006870412463240089, 1.0), mean: 0.292584, var: 0.051095
+
+.\scoring_clu_pr.txt:
+centrality scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+normalized scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+weight scores:			min-max: (0.0, 1.0), mean: 0.164088, var: 0.054979
+combined scores:		min-max: (0.0, 1.0), mean: 0.427487, var: 0.067610
+
+.\scoring_clu_prw.txt:
+centrality scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+normalized scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+weight scores:			min-max: (0.0026041666666666665, 1.0), mean: 0.171390, var: 0.053407
+combined scores:		min-max: (0.0013020833333333333, 1.0), mean: 0.431138, var: 0.068139
+
+.\scoring_clu_prw_mul.txt:
+centrality scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+normalized scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+weight scores:			min-max: (0.0026041666666666665, 1.0), mean: 0.171390, var: 0.053407
+combined scores:		min-max: (0.0, 1.0), mean: 0.139027, var: 0.044631
+
+.\scoring_clu_prw_unb.txt:
+centrality scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+normalized scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+weight scores:			min-max: (0.0015624999999999999, 1.0), mean: 0.168470, var: 0.053607
+combined scores:		min-max: (0.00046874999999999993, 1.0), mean: 0.534161, var: 0.100352
+
+.\scoring_clu_prw_unb_mul.txt:
+centrality scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+normalized scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+weight scores:			min-max: (0.0015624999999999999, 1.0), mean: 0.168470, var: 0.053607
+combined scores:		min-max: (0.0, 1.0), mean: 0.136271, var: 0.044469
+
+.\scoring_clu_simple.txt:
+centrality scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+normalized scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+
+.\scoring_clu_weighted.txt:
+centrality scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+normalized scores:		min-max: (0.0, 1.0), mean: 0.690886, var: 0.177914
+weight scores:			min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055408
+combined scores:		min-max: (0.002544529262086514, 1.0), mean: 0.434789, var: 0.069562
+
+.\scoring_pag_pr.txt:
+centrality scores:		min-max: (0.0008741209299725945, 0.08333333333333333), mean: 0.008724, var: 0.000088
+normalized scores:		min-max: (0.027885881921920676, 1.0), mean: 0.257189, var: 0.033766
+weight scores:			min-max: (0.0, 1.0), mean: 0.164088, var: 0.054979
+combined scores:		min-max: (0.01598069178749369, 1.0), mean: 0.210639, var: 0.033686
+
+.\scoring_pag_prw.txt:
+centrality scores:		min-max: (0.0008741209299725945, 0.08333333333333333), mean: 0.008724, var: 0.000088
+normalized scores:		min-max: (0.027885881921920676, 1.0), mean: 0.257189, var: 0.033766
+weight scores:			min-max: (0.0026041666666666665, 1.0), mean: 0.171390, var: 0.053407
+combined scores:		min-max: (0.016379124719953946, 1.0), mean: 0.214290, var: 0.034107
+
+.\scoring_pag_prw_mul.txt:
+centrality scores:		min-max: (0.0008741209299725945, 0.08333333333333333), mean: 0.008724, var: 0.000088
+normalized scores:		min-max: (0.027885881921920676, 1.0), mean: 0.257189, var: 0.033766
+weight scores:			min-max: (0.0026041666666666665, 1.0), mean: 0.171390, var: 0.053407
+combined scores:		min-max: (0.00010903990075791807, 1.0), mean: 0.068704, var: 0.018778
+
+.\scoring_pag_prw_unb.txt:
+centrality scores:		min-max: (0.0008741209299725945, 0.08333333333333333), mean: 0.008724, var: 0.000088
+normalized scores:		min-max: (0.027885881921920676, 1.0), mean: 0.257189, var: 0.033766
+weight scores:			min-max: (0.0015624999999999999, 1.0), mean: 0.168470, var: 0.053607
+combined scores:		min-max: (0.02095582467999834, 1.0), mean: 0.230573, var: 0.031440
+
+.\scoring_pag_prw_unb_mul.txt:
+centrality scores:		min-max: (0.0008741209299725945, 0.08333333333333333), mean: 0.008724, var: 0.000088
+normalized scores:		min-max: (0.027885881921920676, 1.0), mean: 0.257189, var: 0.033766
+weight scores:			min-max: (0.0015624999999999999, 1.0), mean: 0.168470, var: 0.053607
+combined scores:		min-max: (8.161911110732633e-05, 1.0), mean: 0.067301, var: 0.018573
+
+.\scoring_pag_simple.txt:
+centrality scores:		min-max: (0.0008741209299725945, 0.08333333333333333), mean: 0.008724, var: 0.000088
+normalized scores:		min-max: (0.027885881921920676, 1.0), mean: 0.257189, var: 0.033766
+
+.\scoring_pag_weighted.txt:
+centrality scores:		min-max: (0.0008741209299725945, 0.08333333333333333), mean: 0.008724, var: 0.000088
+normalized scores:		min-max: (0.027885881921920676, 1.0), mean: 0.257189, var: 0.033766
+weight scores:			min-max: (0.005089058524173028, 1.0), mean: 0.178693, var: 0.055408
+combined scores:		min-max: (0.016487470223046852, 1.0), mean: 0.217941, var: 0.035421

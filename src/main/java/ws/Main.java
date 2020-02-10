@@ -72,11 +72,15 @@ public class Main {
         Utils.printNow();
         Task1.multipleIndependentCascadeFlow(30, 1, 0.2, 0.8, false, "6_");
         Utils.printNow();
-        Task1.multipleIndependentCascadeFlow(30, 1, 0.2, 0.7, false, "7_");*/
+        Task1.multipleIndependentCascadeFlow(30, 1, 0.2, 0.7, false, "7_");
+        Utils.printNow();
+        Task1.multipleIndependentCascadeFlow(30, 2, 0.1, 0.4, false, "8_");
+        Utils.printNow();
+        Task1.multipleIndependentCascadeFlow(30, 1, 0.1, 0.4, false, "9_");*/
 //        Utils.printNow();
-//        Task1.multipleIndependentCascadeFlow(30, 2, 0.1, 0.4, false, "8_");
-        Utils.printNow();
+//        Task1.multipleIndependentCascadeFlow(30, 1, 0.1, 0.4, true, "10_");
+//        Utils.printNow();
         Task2.traceTopics("", 0.7);
-        Utils.printNow();
+//        Utils.printNow();
     }
 }
