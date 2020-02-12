@@ -11,11 +11,15 @@ import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
 import ws.task1.Task1;
 import ws.task2.Task2;
+import ws.utils.PrettyPrint;
+import ws.utils.Utils;
 
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Map;
+
+import static ws.utils.Utils.*;
 
 public class Main {
 
@@ -32,55 +36,72 @@ public class Main {
      */
     private static void preprocessing() throws ExportException, IOException, URISyntaxException, TransformerException {
         // preprocess DS1
-        IterableResult<Record, ParsingContext> iter1 = Utils.readTSV(
+        IterableResult<Record, ParsingContext> iter1 = readTSV(
                 new String[]{"year", "keyword1", "keyword2", "authors"},"dataset/ds-1.tsv");
         Map<String, Graph<MyVertex, MyEdgeDS1>> graphs1 = Preprocessing.createGraphsFromDS1(iter1);
         Preprocessing.writeGraphsFromDS1(graphs1);
 
         // preprocess DS2
-        IterableResult<Record, ParsingContext> iter2 = Utils.readTSV(
+        IterableResult<Record, ParsingContext> iter2 = readTSV(
                 new String[]{"year", "author1", "author2", "collaborations"},"dataset/ds-2.tsv");
         Map<String, Graph<MyVertex, DefaultWeightedEdge>> graphs2 = Preprocessing.createGraphsFromDS2(iter2);
         Preprocessing.writeGraphsFromDS2(graphs2);
     }
 
     /**
-     * Execute all the steps of the preprocessing phase by calling {@link #preprocessing()}, then all the steps of the
-     * first task by calling {@link Task1#tryMeasures()}.
+     *
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws ImportException
+     */
+    private static void humanReadableOutput() throws IOException, URISyntaxException, ImportException {
+        PrettyPrint.topK();
+        PrettyPrint.spreadOfInfluence();
+        PrettyPrint.merge();
+        PrettyPrint.tracing();
+    }
+
+    /**
+     * Execute all the steps of the preprocessing phase by calling {@link #preprocessing}, then all the steps of the
+     * first task by calling {@link Task1#tryMeasures} and {@link Task1#multipleIndependentCascadeFlow)},
+     * and the steps in the second task by calling {@link Task2#traceTopics}.
+     * Finally, it reds the last outputs of the various steps and writes more human-readable logs,
+     * by calling{@link #humanReadableOutput}.
      * @param args Not needed.
-     * @throws ExportException if raised by {@link #preprocessing()}.
-     * @throws TransformerException if raised by {@link #preprocessing()}.
-     * @throws IOException if raised by {@link Task1#tryMeasures()} or by {@link #preprocessing()}.
-     * @throws URISyntaxException if raised by {@link Task1#tryMeasures()} or by {@link #preprocessing()}.
-     * @throws ImportException if raised by {@link Task1#tryMeasures()}.
+     * @throws ExportException if raised by {@link #preprocessing}.
+     * @throws TransformerException if raised by {@link #preprocessing}.
+     * @throws IOException if raised by any of the called methods.
+     * @throws URISyntaxException if raised by any of the called methods.
+     * @throws ImportException if raised by any of the called methods.
      */
     public static void main(String... args) throws ExportException, IOException, URISyntaxException, TransformerException, ImportException {
-//        Utils.printNow();
-//        preprocessing();
-//        Utils.printNow();
-//        Task1.tryMeasures();
-//        Utils.printNow();
+        printNow();
+        preprocessing();
+        printNow();
+        Task1.tryMeasures();
+        printNow();
         /*Task1.multipleIndependentCascadeFlow(30, 1.5, 0.3, 0.5, true, "15_");
-        Utils.printNow();
+        printNow();
         Task1.multipleIndependentCascadeFlow(30, 1, 0.3, 0.5, true, "1_");
-        Utils.printNow();
+        printNow();
         Task1.multipleIndependentCascadeFlow(30, 1, 0.3, 0.7, false, "2_");
-        Utils.printNow();
+        printNow();
         Task1.multipleIndependentCascadeFlow(30, 1, 0.3, 0.8, false, "4_");
-        Utils.printNow();
+        printNow();
         Task1.multipleIndependentCascadeFlow(30, 1, 0.3, 0.8, false, "5_");
-        Utils.printNow();
+        printNow();
         Task1.multipleIndependentCascadeFlow(30, 1, 0.2, 0.8, false, "6_");
-        Utils.printNow();
+        printNow();
         Task1.multipleIndependentCascadeFlow(30, 1, 0.2, 0.7, false, "7_");
-        Utils.printNow();
+        printNow();
         Task1.multipleIndependentCascadeFlow(30, 2, 0.1, 0.4, false, "8_");
-        Utils.printNow();
-        Task1.multipleIndependentCascadeFlow(30, 1, 0.1, 0.4, false, "9_");*/
-//        Utils.printNow();
-//        Task1.multipleIndependentCascadeFlow(30, 1, 0.1, 0.4, true, "10_");
-//        Utils.printNow();
+        printNow();
+        Task1.multipleIndependentCascadeFlow(30, 1, 0.1, 0.4, false, "9_");
+        printNow();*/
+        Task1.multipleIndependentCascadeFlow(30, 1, 0.1, 0.4, true, "10_");
+        printNow();
         Task2.traceTopics("", 0.7);
-//        Utils.printNow();
+        printNow();
+        humanReadableOutput();
     }
 }

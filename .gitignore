@@ -9,10 +9,11 @@
 /target/classes/ws/*
 !/target/classes/ws/logs
 !/target/classes/ws/plots
+!/target/classes/ws/readable_output
 /target/generated-sources/
 /target/generated-test-sources/
 /target/classes/ws/test/
 
 /ws_project.iml
 /.idea/
-/src/test/java/ws/Prova
+/src/test/java/ws/Prova.java

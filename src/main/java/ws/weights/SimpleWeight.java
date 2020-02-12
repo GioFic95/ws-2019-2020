@@ -2,7 +2,7 @@ package ws.weights;
 
 import org.jgrapht.Graph;
 import org.jgrapht.alg.util.NeighborCache;
-import ws.Utils;
+import ws.utils.Utils;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
 

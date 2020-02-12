@@ -11,7 +11,6 @@ import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
-import guru.nidi.graphviz.model.Node;
 import guru.nidi.graphviz.parse.Parser;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.scoring.PageRank;
@@ -22,7 +21,9 @@ import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.io.*;
 import org.w3c.dom.Document;
-import ws.Utils;
+import ws.myGraph.MyEdgeDS1;
+import ws.myGraph.MyVertex;
+import ws.utils.Utils;
 
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
@@ -32,8 +33,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -157,7 +156,6 @@ public class GraphUtils {
     public static void writeImage(File dot, String path, String name) throws IOException, URISyntaxException {
         MutableGraph g = Parser.read(dot);
         File imgFile = Utils.getNewFile(path, name, "svg");
-//        Utils.print(imgFile.getParentFile().exists());
         Graphviz.fromGraph(g).width(700).render(Format.SVG).toFile(imgFile);
     }
 
@@ -174,13 +172,11 @@ public class GraphUtils {
     public static void writeImage(File dot, String path, String name, List<String> nodes) throws IOException, URISyntaxException {
         MutableGraph g = Parser.read(dot);
         g.nodes().forEach(node -> {
-//            Utils.print("Node: " + node);
             if (nodes.contains(node.name().toString())) {
                 node.add(Color.CYAN, Style.FILLED);
             }
         });
         File imgFile = Utils.getNewFile(path, name, "svg");
-//        Utils.print(imgFile.getParentFile().exists());
         Graphviz.fromGraph(g).width(700).render(Format.SVG).toFile(imgFile);
     }
 
@@ -238,7 +234,6 @@ public class GraphUtils {
         }
 
         File imgFile = Utils.getNewFile(path, name, "svg");
-//        Utils.print(imgFile.getParentFile().exists());
         Graphviz.fromGraph(g).width(700).render(Format.SVG).toFile(imgFile);
     }
 
@@ -249,7 +244,7 @@ public class GraphUtils {
      * @param path  The path where to save the produced image.
      * @param name  The name to give to the produced image.
      * @throws URISyntaxException if raised by {@link Utils#getNewFile(String, String, String)}).
-     * @throws TransformerException if can't
+     * @throws TransformerException if can't actually write the current image.
      */
     public static void writeImage(Graph g, String path, String name) throws URISyntaxException, TransformerException {
         JGraphXAdapter<Object, DefaultEdge> graphAdapter = new JGraphXAdapter<Object, DefaultEdge>(g);
@@ -278,5 +273,19 @@ public class GraphUtils {
         Graph<MyVertex, DefaultWeightedEdge> graph = loadDS2Graph(year);
         PageRank<MyVertex, DefaultWeightedEdge> pageRank = new PageRank<>(graph);
         return pageRank.getScores();
+    }
+
+    /**
+     * todo
+     * @param year
+     * @throws ImportException if raised by {@link #loadDS1Graph(String)}
+     * @throws IOException if raised by {@link #loadDS1Graph(String)}
+     * @throws URISyntaxException if raised by {@link #loadDS1Graph(String)}
+     */
+    public static Map<String, String> getGraphMap(String year) throws ImportException, IOException, URISyntaxException {
+        Graph<MyVertex, MyEdgeDS1> graph = GraphUtils.loadDS1Graph(year);
+        Map<String, String> nodes = new HashMap<>();
+        graph.vertexSet().forEach(mv -> nodes.put(mv.getId(), mv.getValue()));
+        return nodes;
     }
 }

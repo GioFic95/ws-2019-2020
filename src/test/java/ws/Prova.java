@@ -1,18 +1,10 @@
 package ws;
 
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
-import ws.Utils;
-import ws.myGraph.MyVertex;
+import ws.utils.Utils;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Prova {
     public static void main(String... args) throws URISyntaxException, IOException {
@@ -134,12 +126,19 @@ public class Prova {
         });
         Utils.print(s);*/
 
-        Map<String, Integer> mmm = new HashMap<>(Map.of("1", 1, "2", 2, "3", 3));
-        mmm.merge("2", 5, (integer, integer2) -> {
-            Utils.print(integer);
-            Utils.print(integer2);
-            return integer*integer2;
-        });
-        Utils.print(mmm);
+//        Map<String, Integer> mmm = new HashMap<>(Map.of("1", 1, "2", 2, "3", 3));
+//        mmm.merge("2", 5, (integer, integer2) -> {
+//            Utils.print(integer);
+//            Utils.print(integer2);
+//            return integer*integer2;
+//        });
+//        Utils.print(mmm);
+
+        int seedCounter = 0;
+        String[] seeds = {"5", "10", "20", "100"};
+        for (int i=0; i<15; i++) {
+            Utils.print(seedCounter + " --> " + seeds[seedCounter]);
+            seedCounter = (seedCounter + 1 ) % seeds.length;
+        }
     }
 }

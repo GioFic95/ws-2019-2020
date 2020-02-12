@@ -1,4 +1,4 @@
-package ws;
+package ws.utils;
 
 import com.univocity.parsers.common.IterableResult;
 import com.univocity.parsers.common.ParsingContext;
@@ -6,13 +6,13 @@ import com.univocity.parsers.common.record.Record;
 import com.univocity.parsers.tsv.TsvParser;
 import com.univocity.parsers.tsv.TsvParserSettings;
 import guru.nidi.graphviz.attribute.Color;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import ws.Main;
+import ws.Preprocessing;
 
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -55,6 +55,7 @@ public class Utils {
      * name plus the current timestamp.
      * @param sb       The content to be written into the log file.
      * @param fileName The name to be assigned to the log file, together with the current timestamp.
+     * @param addDate If true, create a new file with the current timestamp, otherwise, add content to a pre-existent file.
      * @throws IOException if it can't write to the created log file.
      * @throws URISyntaxException if raised by {@link #getNewFile(String, String, String)}).
      */

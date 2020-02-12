@@ -1,4 +1,4 @@
-package ws.task1;
+package ws.utils;
 
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -8,14 +8,12 @@ import com.univocity.parsers.common.record.Record;
 import org.jgrapht.Graph;
 import org.jgrapht.io.ImportException;
 import ws.Main;
-import ws.Utils;
 import ws.myGraph.GraphUtils;
+import ws.task1.Task1;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
 import ws.myGraph.SimpleDirectedEdge;
-import ws.weights.PageRankWeight;
 import ws.weights.SimpleWeight;
-import ws.weights.Weight;
 
 import java.io.File;
 import java.io.IOException;

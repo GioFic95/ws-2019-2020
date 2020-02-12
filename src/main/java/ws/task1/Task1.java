@@ -10,7 +10,8 @@ import org.jgrapht.Graph;
 import org.jgrapht.alg.util.UnorderedPair;
 import org.jgrapht.io.ImportException;
 import org.json.JSONArray;
-import ws.Utils;
+import ws.utils.DiffusionUtils;
+import ws.utils.Utils;
 import ws.myGraph.GraphUtils;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
@@ -211,7 +212,7 @@ public class Task1 {
             try {
                 iteration = row.getInt("currentIteration");
             } catch (NumberFormatException ex) {
-                Utils.print(row);
+                Utils.print("Can't parse string '" + row.getString("currentIteration") + "' as Integer.");
                 continue;
             }
             String year = row.getString("year");

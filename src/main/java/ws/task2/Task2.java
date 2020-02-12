@@ -5,7 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import com.univocity.parsers.common.IterableResult;
 import com.univocity.parsers.common.ParsingContext;
 import com.univocity.parsers.common.record.Record;
-import ws.Utils;
+import ws.utils.Utils;
 import ws.myGraph.MyVertex;
 
 import java.io.IOException;

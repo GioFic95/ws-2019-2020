@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import ws.myGraph.GraphUtils;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
+import ws.utils.Utils;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;
@@ -21,7 +22,7 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static ws.Utils.*;
+import static ws.utils.Utils.*;
 
 /**
  * Class used to perform all the jobs related to the preprocessing phase.

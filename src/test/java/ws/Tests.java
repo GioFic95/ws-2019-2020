@@ -12,7 +12,8 @@ import ws.myGraph.GraphUtils;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
 import ws.myGraph.SimpleDirectedEdge;
-import ws.task1.DiffusionUtils;
+import ws.utils.DiffusionUtils;
+import ws.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;

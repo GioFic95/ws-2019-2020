@@ -4,7 +4,8 @@ import org.jgrapht.Graph;
 import org.jgrapht.alg.util.NeighborCache;
 import org.jgrapht.alg.scoring.PageRank;
 import org.jgrapht.io.ImportException;
-import ws.Utils;
+import ws.myGraph.GraphUtils;
+import ws.utils.Utils;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
 
@@ -35,7 +36,7 @@ public class PageRankWeight extends Weight<MyVertex, MyEdgeDS1> {
     }
 
     /**
-     * Uses {@link ws.myGraph.GraphUtils#authorsPageRank(String)} to compute the {@link PageRank} of the authors that
+     * Uses {@link GraphUtils#authorsPageRank(String)} to compute the {@link PageRank} of the authors that
      * appear on the edges of this graph, and, based on this score, produces the weighing of the graph, assigning to
      * each node the normalized sum of the scores of the authors that appears on the edges incident on that node.
      * @param normalize If the results have to be normalized.

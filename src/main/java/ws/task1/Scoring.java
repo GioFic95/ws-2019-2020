@@ -2,7 +2,7 @@ package ws.task1;
 
 import org.jgrapht.Graph;
 import org.jgrapht.alg.scoring.*;
-import ws.Utils;
+import ws.utils.Utils;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
 import ws.weights.Weight;
@@ -10,7 +10,6 @@ import ws.weights.Weight;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Class used to define and compute the scoring of the nodes of the graphs in DS1.

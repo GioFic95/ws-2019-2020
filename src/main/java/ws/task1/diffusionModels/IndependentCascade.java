@@ -1,10 +1,9 @@
 package ws.task1.diffusionModels;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.util.NeighborCache;
-import ws.Utils;
+import ws.utils.Utils;
 import ws.myGraph.MyEdgeDS1;
 import ws.myGraph.MyVertex;
 import ws.myGraph.SimpleDirectedEdge;
@@ -78,7 +77,6 @@ public class IndependentCascade extends DiffusionModel{
                                 if (coin <= threshold) {
                                     currentStatuses.put(v2, NodeStatus.INFECTED);
                                     infectedNodes.get(v1).add(v2);
-//                                    Utils.print(infectedNodes.get(v1));
                                 }
                             }
                         }
@@ -107,50 +105,5 @@ public class IndependentCascade extends DiffusionModel{
                     .map(e -> e.getKey().getId())
                     .collect(Collectors.toSet());
         }
-    }
-
-    /**
-     * Independent Cascade
-     * todo remove this method if useless as it seems.
-     * @return todo
-     * @see <a href="http://www.sumankundu.info/articles/detail/How-To-Code-Independent-Cascade-Model-of-Information-Diffusion#lis:Single-Diffusion" target="_blank">Independent Cascade Model of Information Diffusion - Suman Kundu</a>.
-     */
-    public Map<String, List<String>> propagate() {
-        NeighborCache<MyVertex, MyEdgeDS1> neighborGraph = new NeighborCache<>(graph);
-        //Map<MyEdgeDS1, Double> probabilities = propagationProbabilities;
-        Random ran = new Random();
-
-        Set<MyVertex> active = new HashSet<>(); //will store the active nodes
-        Stack<MyVertex> target = new Stack<>(); //will store unprocessed nodes during intermediate time
-        Map<String, List<String>> result = new HashMap<>(); //will store the results
-
-        for (Map.Entry<MyVertex, NodeStatus> entry : statuses.entrySet()) {
-            if (entry.getValue() != NodeStatus.INFECTED) {
-                continue;
-            }
-            MyVertex s = entry.getKey();
-            List<String> newNodes = new ArrayList<>();
-            target.push(s);
-            while (target.size() > 0) {
-                MyVertex node = target.pop();
-                active.add(node);
-                newNodes.add(node.getId());
-
-                for (MyVertex follower : neighborGraph.neighborsOf(node)) {
-                    Utils.print("edge: " + node + " - " + follower);
-                    float randnum = ran.nextFloat();
-                    SimpleDirectedEdge myEdge = new SimpleDirectedEdge(node, follower);
-                    double prob = propagationProbabilities.get(myEdge);
-                    Utils.print("rand: " + randnum + ", prob: " + prob);
-                    if (randnum <= prob) {
-                        if (!active.contains(follower)) {
-                            target.push(follower);
-                        }
-                    }
-                }
-            }
-            result.put(s.getId(), newNodes);
-        }
-        return result;
     }
 }
