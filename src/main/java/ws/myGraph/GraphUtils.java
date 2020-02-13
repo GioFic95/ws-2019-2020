@@ -21,8 +21,6 @@ import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.jgrapht.io.*;
 import org.w3c.dom.Document;
-import ws.myGraph.MyEdgeDS1;
-import ws.myGraph.MyVertex;
 import ws.utils.Utils;
 
 import javax.xml.transform.*;
@@ -181,12 +179,14 @@ public class GraphUtils {
     }
 
     /**
-     * Creates and stores a plot of the graph written into the given DOT file, the given nodes are colored. todo
+     * Creates and stores a plot of the graph written into the given DOT file, the given nodes are colored such that
+     * nodes in the same topic have the same color, and seeds are rectangular.
      * It uses {@link Graphviz} to read the graph and produce the plot.
      * @param dot   The DOT file containing the serialized graph.
      * @param path  The path where to save the produced image.
      * @param name  The name to give to the produced image.
-     * @param nodes The keys that identify the nodes to be colored in the output plot. todo
+     * @param nodes A map of seeds and infected nodes, the seeds can be strings or sets of strings (in case more
+     *              topics were merged in a single one).
      * @throws IOException if can't read the input file.
      * @throws URISyntaxException if raised by {@link Utils#getNewFile(String, String, String)}).
      */
@@ -276,8 +276,8 @@ public class GraphUtils {
     }
 
     /**
-     * todo
-     * @param year
+     * Produces a map id -> value for the nodes of the graph of the given year in DS1.
+     * @param year The year of the graph whose map is to be computed.
      * @throws ImportException if raised by {@link #loadDS1Graph(String)}
      * @throws IOException if raised by {@link #loadDS1Graph(String)}
      * @throws URISyntaxException if raised by {@link #loadDS1Graph(String)}

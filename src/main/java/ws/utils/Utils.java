@@ -6,7 +6,6 @@ import com.univocity.parsers.common.record.Record;
 import com.univocity.parsers.tsv.TsvParser;
 import com.univocity.parsers.tsv.TsvParserSettings;
 import guru.nidi.graphviz.attribute.Color;
-import org.jetbrains.annotations.NotNull;
 import ws.Main;
 import ws.Preprocessing;
 
@@ -25,32 +24,6 @@ import java.util.stream.Collectors;
 public class Utils {
 
     /**
-     * A commodity function to print objects faster.
-     * @param x The object to print.
-     */
-    public static void print(Object x) {
-        if (x == null) {
-            System.out.println("null");
-        } else if (x.getClass().isArray()) {
-            System.out.println("ARRAY!");
-            List<Object> l = Arrays.asList((Object[]) x);
-            System.out.println(l);
-        } else {
-            System.out.println(x);
-        }
-    }
-
-    /**
-     * A commodity function to print iterable objects faster, with one element per row.
-     * @param iter The iterable object to print.
-     */
-    public static void printList(@NotNull Iterable iter) {
-        for (Object o : iter) {
-            System.out.println(o);
-        }
-    }
-
-    /**
      * A commodity function to print simple log files with the given content, and with a name consisting of the given
      * name plus the current timestamp.
      * @param sb       The content to be written into the log file.
@@ -59,7 +32,7 @@ public class Utils {
      * @throws IOException if it can't write to the created log file.
      * @throws URISyntaxException if raised by {@link #getNewFile(String, String, String)}).
      */
-    public static void writeLog(@NotNull StringBuilder sb, String fileName, boolean addDate) throws IOException, URISyntaxException {
+    public static void writeLog(StringBuilder sb, String fileName, boolean addDate) throws IOException, URISyntaxException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd__HH_mm_ss");
         String now = addDate ? "__" + LocalDateTime.now().format(formatter) : "";
         File f = getNewFile("logs", fileName + now, "txt");
@@ -69,13 +42,14 @@ public class Utils {
     }
 
     /**
-     * todo
-     * @param sb
-     * @param fileName
+     * A shortcut for {@link #writeLog(StringBuilder, String, boolean)} when the date is needed, since it's the
+     * usual condition.
+     * @param sb       The content to be written into the log file.
+     * @param fileName The name to be assigned to the log file, together with the current timestamp.
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static void writeLog(@NotNull StringBuilder sb, String fileName) throws IOException, URISyntaxException {
+    public static void writeLog(StringBuilder sb, String fileName) throws IOException, URISyntaxException {
         writeLog(sb, fileName, true);
     }
 
@@ -106,7 +80,6 @@ public class Utils {
      * @return The file object created with the given parameters.
      * @throws URISyntaxException if it can't build a valid {@link java.net.URI} from the given file name.
      */
-    @NotNull
     public static File getNewFile(String pathName, String fileName, String ext) throws URISyntaxException {
         URI res;
         try {
@@ -116,10 +89,15 @@ public class Utils {
         }
 
         String path = res.getPath() + "/" + fileName + "." + ext;
-//        print(path);
         return new File(path);
     }
 
+    /**
+     * A commodity function to easily delete useless files, such as old logs or plots.
+     * @param pathName The path of the directory that contains the files to be removed.
+     * @param pattern  The pattern with which the files to be removed must match.
+     * @throws URISyntaxException if the given path can't be found and converted to URI.
+     */
     public static void delMatchigFiles(String pathName, String pattern) throws URISyntaxException {
         URI res = Main.class.getResource(pathName).toURI();
         File folder = new File(res);
@@ -134,6 +112,14 @@ public class Utils {
         }
     }
 
+    /**
+     * Find the last n logs that match with the given pattern. Useful if we want to consider some logs regarding a
+     * specific part of the system.
+     * @param pattern The pattern with which the files to be retrieved must match.
+     * @param n       The number of logs to be retrieved.
+     * @return The names of the n most recent log files matching with the given pattern.
+     * @throws URISyntaxException if the log directory can't be found and converted to URI.
+     */
     public static List<String> findLastLogs(String pattern, int n) throws URISyntaxException {
         URI res = Main.class.getResource("logs").toURI();
         File folder = new File(res);
@@ -148,20 +134,48 @@ public class Utils {
         }
     }
 
+    /**
+     * A shortcut for {@link #findLastLogs(String, int)}, useful if we're only interested in the most recent log.
+     * @param pattern The pattern with which the files to be retrieved must match.
+     * @return The name of the most recent log file matching with the given pattern.
+     * @throws URISyntaxException if the log directory can't be found and converted to URI.
+     */
     public static String findLastLog(String pattern) throws URISyntaxException {
         return findLastLogs(pattern, 1).get(0);
     }
 
+    /**
+     * A commodity function to easily and nicely print the current timestamp.
+     */
     public static void printNow() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd__HH_mm_ss");
         String now = LocalDateTime.now().format(formatter);
         print(now);
     }
 
+    /**
+     * A commodity function to compute a random RGB color.
+     * @return a random color.
+     */
     public static Color getRandColor() {
         int red = ThreadLocalRandom.current().nextInt(50, 156);
         int green = ThreadLocalRandom.current().nextInt(50, 156);
         int blue = ThreadLocalRandom.current().nextInt(50, 156);
         return Color.rgb(red, green, blue);
+    }
+
+    /**
+     * A commodity function to print objects faster.
+     * @param x The object to print.
+     */
+    public static void print(Object x) {
+        if (x == null) {
+            System.out.println("null");
+        } else if (x.getClass().isArray()) {
+            List<Object> l = Arrays.asList((Object[]) x);
+            System.out.println(l);
+        } else {
+            System.out.println(x);
+        }
     }
 }

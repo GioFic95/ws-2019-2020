@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
+import static ws.utils.Utils.writeLog;
+
 /**
  * Class used to define and compute the scoring of the nodes of the graphs in DS1.
  */
@@ -21,6 +23,10 @@ public class Scoring {
     enum ScoringMeasure {
         CLUSTERING_COEFFICIENT, BETWEENNESS_CENTRALITY, CLOSENESS_CENTRALITY, ALPHA_CENTRALITY, PAGE_RANK;
 
+        /**
+         * Compute a string representation of this metric.
+         * @return A string representation of this metric.
+         */
         @Override
         public String toString() {
             return name().substring(0, 3).toLowerCase();
@@ -36,8 +42,8 @@ public class Scoring {
      * @param b       The proportion in which the weight is considered compared to the scoring.
      * @param k       How many nodes to pick as the "top ones".
      * @return        The list of the ids of the top k nodes, according to the specified scoring and weight.
-     * @throws IOException todo
-     * @throws URISyntaxException todo
+     * @throws IOException if raised by {@link Utils#writeLog}.
+     * @throws URISyntaxException if raised by {@link Utils#writeLog}.
      */
     static List<String> computeScoring(
             Graph<MyVertex, MyEdgeDS1> graph, String year, String name, ScoringMeasure scoring, Weight<MyVertex,
@@ -85,7 +91,7 @@ public class Scoring {
         }
         sb.append("\n");
 
-        Utils.writeLog(sb, "scoring_" + name, false);
+        writeLog(sb, "scoring_" + name, false);
 
         List<String> topK = new ArrayList<>();
         for (int i=0; i<k; i++) {
@@ -102,8 +108,8 @@ public class Scoring {
      * @param scoring The scoring measure to be used.
      * @param k       How many nodes to pick as the "top ones".
      * @return        The list of the ids of the top k nodes, according to the specified scoring and weight.
-     * @throws IOException todo
-     * @throws URISyntaxException todo
+     * @throws IOException if raised by {@link #computeScoring(Graph, String, String, ScoringMeasure, Weight, double, double, int)}
+     * @throws URISyntaxException if raised by {@link #computeScoring(Graph, String, String, ScoringMeasure, Weight, double, double, int)}
      */
     static List<String> computeScoring(Graph<MyVertex, MyEdgeDS1> graph, String year, String name, ScoringMeasure scoring, int k)
             throws IOException, URISyntaxException {
@@ -116,8 +122,8 @@ public class Scoring {
      * @param scoring The scoring measure to be used.
      * @param k       How many nodes to pick as the "top ones".
      * @return        The list of the ids of the top k nodes, according to the specified scoring and weight.
-     * @throws IOException todo
-     * @throws URISyntaxException todo
+     * @throws IOException if raised by {@link #computeScoring(Graph, String, String, ScoringMeasure, Weight, double, double, int)}.
+     * @throws URISyntaxException if raised by {@link #computeScoring(Graph, String, String, ScoringMeasure, Weight, double, double, int)}.
      */
     static List<String> computeScoringMul(Graph<MyVertex, MyEdgeDS1> graph, String year, String name,
                                           ScoringMeasure scoring, Weight<MyVertex, MyEdgeDS1> weight, int k)

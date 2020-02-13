@@ -49,10 +49,11 @@ public class Main {
     }
 
     /**
-     *
-     * @throws IOException
-     * @throws URISyntaxException
-     * @throws ImportException
+     * Write human-readable logs by calling {@link PrettyPrint#topK()}, {@link PrettyPrint#spreadOfInfluence()},
+     * {@link PrettyPrint#merge()} and {@link PrettyPrint#tracing()}.
+     * @throws IOException if raised by any of the called methods.
+     * @throws URISyntaxException if raised by any of the called methods.
+     * @throws ImportException if raised by {@link PrettyPrint#topK()} or {@link PrettyPrint#spreadOfInfluence()}.
      */
     private static void humanReadableOutput() throws IOException, URISyntaxException, ImportException {
         PrettyPrint.topK();
@@ -65,7 +66,7 @@ public class Main {
      * Execute all the steps of the preprocessing phase by calling {@link #preprocessing}, then all the steps of the
      * first task by calling {@link Task1#tryMeasures} and {@link Task1#multipleIndependentCascadeFlow)},
      * and the steps in the second task by calling {@link Task2#traceTopics}.
-     * Finally, it reds the last outputs of the various steps and writes more human-readable logs,
+     * Finally, read the last outputs of the various steps and writes more human-readable logs,
      * by calling{@link #humanReadableOutput}.
      * @param args Not needed.
      * @throws ExportException if raised by {@link #preprocessing}.

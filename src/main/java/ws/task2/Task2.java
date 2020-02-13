@@ -14,13 +14,29 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ws.utils.Utils.findLastLog;
+import static ws.utils.Utils.writeLog;
+
+/**
+ * Class used to perform all the jobs related to the second task.
+ */
 public class Task2 {
+
+    /**
+     * Trace the topics behavior among years, for each k in {5, 10, 20, 100}.
+     * @param fileNamePattern The pattern to be used to find the log file with the merge information.
+     * @param threshold       Two topics of different years are merged if their similarity is grater than the threshold.
+     *                        For this purpose the overlap coefficient is used.
+     * @throws URISyntaxException if raised by {@link Utils#findLastLogs} or {@link Utils#writeLog}.
+     * @throws IOException if raised by {@link Utils#writeLog}.
+     * @see <a href="https://en.wikipedia.org/wiki/Overlap_coefficient" target="_blank">Overlap Coefficient</a>.
+     */
     public static void traceTopics(String fileNamePattern, double threshold) throws URISyntaxException, IOException {
         String fileName;
         if (fileNamePattern == null || fileNamePattern.equals("")) {
-            fileName = Utils.findLastLog("ic_results_merged2__.*\\.txt");
+            fileName = findLastLog("ic_results_merged2__.*\\.txt");
         } else {
-            fileName = Utils.findLastLog(fileNamePattern);
+            fileName = findLastLog(fileNamePattern);
         }
         Utils.print("file name: " + fileName);
 
@@ -118,6 +134,6 @@ public class Task2 {
             });
             sb.append("\n\n\n");
         });
-        Utils.writeLog(sb, "topic_tracing");
+        writeLog(sb, "topic_tracing");
     }
 }

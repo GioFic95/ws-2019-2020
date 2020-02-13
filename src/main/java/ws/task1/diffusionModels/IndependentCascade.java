@@ -14,12 +14,23 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * A class that represent the Independent Cascade diffusion model.
+ */
 public class IndependentCascade extends DiffusionModel{
     private Map<SimpleDirectedEdge, Double> propagationProbabilities;
     private NeighborCache<MyVertex, MyEdgeDS1> neighborGraph;
     private String year;
     private String name;
 
+    /**
+     * Build the independent cascade model.
+     * @param name              The name of the model instance, to be used in the logs.
+     * @param year              The year of the graph on which the model has to be applied.
+     * @param graph             The graph on which the model has to be applied.
+     * @param seeds             The set of nodes from which the diffusion begins.
+     * @param edgeProbabilities The probability each node has to infect a neighbor (oriented).
+     */
     public IndependentCascade(String name, String year, Graph<MyVertex, MyEdgeDS1> graph,
                               List<String> seeds, Map<SimpleDirectedEdge, Double> edgeProbabilities) {
         super(graph, seeds);
@@ -30,8 +41,8 @@ public class IndependentCascade extends DiffusionModel{
     }
 
     /**
-     *
-     * @return
+     * Simulate an iteration of the Independent Cascade model.
+     * @return The set of nodes that became infected in this iteration.
      * @see <a href="https://github.com/GiulioRossetti/ndlib/blob/master/ndlib/models/epidemics/IndependentCascadesModel.py" target="_blank">Independent Cascade Model - NDLIB</a>.
      */
     @Override

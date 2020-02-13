@@ -30,6 +30,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ws.utils.Utils.*;
+
 
 /**
  * Class used to perform all the jobs related to the first task.
@@ -46,14 +48,14 @@ public class Task1 {
      */
     public static void tryMeasures() throws URISyntaxException, IOException, ImportException {
         // delete old logs about scoring
-        Utils.delMatchigFiles("logs", "(scoring|simple_weight|page_rank)[a-zA-Z_]*\\.txt");
+        delMatchigFiles("logs", "(scoring|simple_weight|page_rank)[a-zA-Z_]*\\.txt");
         Map<String, StringBuilder> sbs = new HashMap<>();
 
         for (int i=2000; i<=2018; i++) {
             for (int k : new int[]{5, 10, 20, 100}) {
                 String year = String.valueOf(i);
                 Graph<MyVertex, MyEdgeDS1> graph = GraphUtils.loadDS1Graph(year);
-                File dot = Utils.getNewFile("graphs/ds1", year, "dot");
+                File dot = getNewFile("graphs/ds1", year, "dot");
                 String name;
                 List<String> top;
                 StringBuilder sb;
@@ -63,11 +65,11 @@ public class Task1 {
                     name = scoring.toString() + "_simple";
                     sb = sbs.computeIfAbsent(name, s -> new StringBuilder());
                     top = Scoring.computeScoring(graph, year, name, scoring, k);
-                    Utils.print(top);
+                    print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
                     if (i == 2018 && k == 100) {
-                        Utils.writeLog(sb, name);
+                        writeLog(sb, name);
                     }
 
                     // metric weighted with SimpleWeight (based on number of papers using that keyword)
@@ -75,11 +77,11 @@ public class Task1 {
                     sb = sbs.computeIfAbsent(name, s -> new StringBuilder());
                     Weight<MyVertex, MyEdgeDS1> weight = new SimpleWeight(graph, year, name);
                     top = Scoring.computeScoring(graph, year, name, scoring, weight, 0.5, 0.5, k);
-                    Utils.print(top);
+                    print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
                     if (i == 2018 && k == 100) {
-                        Utils.writeLog(sb, name);
+                        writeLog(sb, name);
                     }
 
                     // metric weighted with page rank of the authors
@@ -87,11 +89,11 @@ public class Task1 {
                     sb = sbs.computeIfAbsent(name, s -> new StringBuilder());
                     Weight<MyVertex, MyEdgeDS1> weightPr = new PageRankWeight(graph, year, name);
                     top = Scoring.computeScoring(graph, year, name, scoring, weightPr, 0.5, 0.5, k);
-                    Utils.print(top);
+                    print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
                     if (i == 2018 && k == 100) {
-                        Utils.writeLog(sb, name);
+                        writeLog(sb, name);
                     }
 
                     // metric weighted with page rank of the authors and number of occurrences of the keyword, with equal weights
@@ -99,22 +101,22 @@ public class Task1 {
                     sb = sbs.computeIfAbsent(name, s -> new StringBuilder());
                     Weight weightPrW = Weight.compose(new SimpleWeight(graph, year, name), new PageRankWeight(graph, year, name), 0.5, 0.5);
                     top = Scoring.computeScoring(graph, year, name, scoring, weightPrW, 0.5, 0.5, k);
-                    Utils.print(top);
+                    print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
                     if (i == 2018 && k == 100) {
-                        Utils.writeLog(sb, name);
+                        writeLog(sb, name);
                     }
 
                     // metric weighted with page rank of the authors and number of occurrences of the keyword, multipled
                     name = scoring.toString() + "_prw_mul";
                     sb = sbs.computeIfAbsent(name, s -> new StringBuilder());
                     top = Scoring.computeScoringMul(graph, year, name, scoring, weightPrW, k);
-                    Utils.print(top);
+                    print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
                     if (i == 2018 && k == 100) {
-                        Utils.writeLog(sb, name);
+                        writeLog(sb, name);
                     }
 
                     // metric weighted with page rank of the authors and number of occurrences of the keyword, with different weights
@@ -122,32 +124,44 @@ public class Task1 {
                     sb = sbs.computeIfAbsent(name, s -> new StringBuilder());
                     Weight weightPrWUnb = Weight.compose(new SimpleWeight(graph, year, name), new PageRankWeight(graph, year, name), 0.3, 0.7);
                     top = Scoring.computeScoring(graph, year, name, scoring, weightPrWUnb, 0.7, 0.3, k);
-                    Utils.print(top);
+                    print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
                     if (i == 2018 && k == 100) {
-                        Utils.writeLog(sb, name);
+                        writeLog(sb, name);
                     }
 
                     // metric weighted with page rank of the authors and number of occurrences of the keyword, with different weights, multiplied
                     name = scoring.toString() + "_prw_unb_mul";
                     sb = sbs.computeIfAbsent(name, s -> new StringBuilder());
                     top = Scoring.computeScoringMul(graph, year, name, scoring, weightPrWUnb, k);
-                    Utils.print(top);
+                    print(top);
                     GraphUtils.writeImage(dot, "plots/"+name, year + "_" + k, top);
                     sb.append(year + "\t" + k + "\t" + top + "\n");
                     if (i == 2018 && k == 100) {
-                        Utils.writeLog(sb, name);
+                        writeLog(sb, name);
                     }
                 }
             }
         }
     }
 
+    /**
+     * Simulate the whole process of spread of influence based on Independent Cascade model
+     * (implemented in {@link IndependentCascade}).
+     * The process stops when there isn't any new infected node.
+     * @param pattern The pattern to be used to find the log file with the information about the seeds.
+     * @param k       The multiplication factor to be used in {@link DiffusionUtils#getEdgePropagationProbabilities}.
+     * @throws ImportException if raised by {@link GraphUtils#loadDS1Graph}.
+     * @throws IOException if raised by {@link GraphUtils#loadDS1Graph}, {@link Utils#writeLog},
+     *              {@link DiffusionUtils#getEdgePropagationProbabilities}.
+     * @throws URISyntaxException if raised by {@link GraphUtils#loadDS1Graph}, {@link Utils#writeLog},
+     *              {@link Utils#findLastLog}, {@link DiffusionUtils#getEdgePropagationProbabilities}.
+     */
     public static void spreadInfluence(String pattern, double k) throws ImportException, IOException, URISyntaxException {
-        String logPath = "logs/" + Utils.findLastLog(pattern);
-        Utils.print("spread influence path: " + logPath);
-        IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "k", "seeds"}, logPath);
+        String logPath = "logs/" + findLastLog(pattern);
+        print("spread influence path: " + logPath);
+        IterableResult<Record, ParsingContext> ir = readTSV(new String[]{"year", "k", "seeds"}, logPath);
         StringBuilder sb = new StringBuilder();
 
         // Prepare csv log file with the header
@@ -156,7 +170,7 @@ public class Task1 {
         StringBuilder sb_iterations = new StringBuilder()
                 .append("year").append("\t").append("currentIteration").append("\t").append("infectedNodes").append("\n");
         try {
-            Utils.writeLog(sb_iterations, name, false);
+            writeLog(sb_iterations, name, false);
         } catch (IOException | URISyntaxException e) {
             System.err.println("couldn't write independent cascade iterations log");
             e.printStackTrace();
@@ -170,7 +184,7 @@ public class Task1 {
                 seeds.add(jsonArray.get(i).toString());
             }
             sb.append(year).append("\t").append(seeds.size()).append("\t").append(seeds).append("\n");
-            Utils.print("\nyear: " + year + ", seeds: " + seeds.size() + " - " + seeds);
+            print("\nyear: " + year + ", seeds: " + seeds.size() + " - " + seeds);
 
             Graph<MyVertex, MyEdgeDS1> graph = GraphUtils.loadDS1Graph(year);
             Map<SimpleDirectedEdge, Double> probabilities = DiffusionUtils.getEdgePropagationProbabilities(graph, year, k);
@@ -179,7 +193,7 @@ public class Task1 {
             while (true) {
                 Set<String> newInfected = independentCascade.iteration();
                 infected = DiffusionUtils.allInfected(infected, newInfected);
-                Utils.print(infected);
+                print(infected);
                 sb.append(infected).append("\n");
                 if (newInfected.isEmpty()) {
                     break;
@@ -187,19 +201,19 @@ public class Task1 {
             }
             sb.append("\n");
         }
-        Utils.writeLog(sb, "independent_cascade");
+        writeLog(sb, "independent_cascade");
     }
 
     /**
-     *
-     * @param pattern
-     * @throws IOException
-     * @throws URISyntaxException
+     * Put all the iteration of a simulation of Independent Cascade together, to reconstruct the whole process.
+     * @param pattern The pattern to be used to find the log file with the information about the Independent Cascade iterations.
+     * @throws IOException if raised by {@link Utils#writeLog}.
+     * @throws URISyntaxException if raised by {@link Utils#writeLog}, {@link Utils#findLastLog}.
      */
     public static void writeUnifiedSpreadInfluence(String pattern) throws IOException, URISyntaxException {
-        String logPath = "logs/" + Utils.findLastLog(pattern);
-        Utils.print("spread influence path: " + logPath);
-        IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "currentIteration", "infectedNodes"}, logPath);
+        String logPath = "logs/" + findLastLog(pattern);
+        print("spread influence path: " + logPath);
+        IterableResult<Record, ParsingContext> ir = readTSV(new String[]{"year", "currentIteration", "infectedNodes"}, logPath);
         Map<MyVertex, Set<MyVertex>> infectedNodesUnified = new HashMap<>();
         Type type = new TypeToken<Map<MyVertex, Set<MyVertex>>>(){}.getType();
         int seedNum = 0;
@@ -212,7 +226,7 @@ public class Task1 {
             try {
                 iteration = row.getInt("currentIteration");
             } catch (NumberFormatException ex) {
-                Utils.print("Can't parse string '" + row.getString("currentIteration") + "' as Integer.");
+                print("Can't parse string '" + row.getString("currentIteration") + "' as Integer.");
                 continue;
             }
             String year = row.getString("year");
@@ -225,7 +239,7 @@ public class Task1 {
                 if (! infectedNodesUnified.isEmpty()) {
                     // Add the previous cascade results to the log
                     String name = prevYear + "_" + seedNum;
-                    Utils.print("writing graph " + name);
+                    print("writing graph " + name);
                     String infectedNodesUnifiedJson = MyVertex.getGson().toJson(infectedNodesUnified, type);
                     sb.append(prevYear).append("\t").append(seedNum).append("\t").append(infectedNodesUnifiedJson).append("\n");
                 }
@@ -251,23 +265,28 @@ public class Task1 {
         }
         // Write the last cascade log
         String name = prevYear + "_" + seedNum;
-        Utils.print("writing graph " + name);
+        print("writing graph " + name);
         String infectedNodesUnifiedJson = MyVertex.getGson().toJson(infectedNodesUnified, type);
         sb.append(prevYear).append("\t").append(seedNum).append("\t").append(infectedNodesUnifiedJson).append("\n");
 
         // Write the independent cascade results log
-        Utils.writeLog(sb, "ic_results");
+        writeLog(sb, "ic_results");
     }
 
     /**
      * Merge the last {@param n} independent cascade results.
-     * @param n
+     * @param n         The number of independent cascade simulations to be merged.
+     * @param ratio     A node is added to a topic if it is infected at least in n/ratio times in the simulations.
+     * @param threshold Two topics are merged if their overlap coefficient is greater than threshold.
+     * @throws URISyntaxException if raised by {@link Utils#writeLog}, {@link Utils#findLastLog}.
+     * @throws IOException if raised by {@link Utils#writeLog}.
+     * @see <a href="https://en.wikipedia.org/wiki/Overlap_coefficient" target="_blank">Overlap Coefficient</a>.
      */
     public static void mergeSpreadInfluenceResults(int n, double ratio, double threshold) throws URISyntaxException, IOException {
         Type type1 = new TypeToken<Map<MyVertex, Set<MyVertex>>>() {}.getType();
         Type type2 = new TypeToken<Map<Set<MyVertex>, Set<MyVertex>>>() {}.getType();
-        List<String> fileNames = Utils.findLastLogs("ic_results__[0-9].*\\.txt", n);
-        Utils.print("fileNames: " + fileNames);
+        List<String> fileNames = findLastLogs("ic_results__[0-9].*\\.txt", n);
+        print("fileNames: " + fileNames);
         StringBuilder sb1 = new StringBuilder()
                 .append("year").append("\t").append("numSeeds").append("\t").append("infectedNodes").append("\n");
         StringBuilder sb2 = new StringBuilder()
@@ -276,7 +295,7 @@ public class Task1 {
         // Create a list of iterators over the selected log files
         List<ResultIterator<Record, ParsingContext>> iterators = new ArrayList<>();
         for (String fileName : fileNames) {
-            ResultIterator<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "numSeeds", "infectedNodes"}, "logs/" + fileName).iterator();
+            ResultIterator<Record, ParsingContext> ir = readTSV(new String[]{"year", "numSeeds", "infectedNodes"}, "logs/" + fileName).iterator();
             iterators.add(ir);
         }
 
@@ -293,7 +312,7 @@ public class Task1 {
             List<Map<MyVertex, Set<MyVertex>>> infectedNodes = new ArrayList<>();
             currentRows.forEach(row -> infectedNodes.add(MyVertex.getGson().fromJson(row.getString("infectedNodes"), type1)));
 
-            // *** PHASE 1: add to a topic each keyword that is infected at least in 1/3rd of the simulations ***
+            // *** PHASE 1: add to a topic each keyword that is infected at least in 1/ratio of the simulations ***
             Map<MyVertex, Map<MyVertex, Integer>> counter = new HashMap<>();
             infectedNodes.forEach(
                     myVertexSetMap -> myVertexSetMap.forEach(
@@ -309,7 +328,7 @@ public class Task1 {
                                                     return map;
                                                 }));
                                 }}));
-            Utils.print("counter: " + counter);
+            print("counter: " + counter);
 
             counter.forEach((k, v) -> infectedNodesMerged.put(k, v.entrySet().stream()
                     .filter(entry -> entry.getValue() >= n*ratio)
@@ -318,7 +337,7 @@ public class Task1 {
 
             // Add the current record to the output file, first phase of merge
             String name = year + "_" + seedNum;
-            Utils.print("writing graph " + name + ", phase 1");
+            print("writing graph " + name + ", phase 1");
             String infectedNodesMergedJson = MyVertex.getGson().toJson(infectedNodesMerged, type1);
             sb1.append(year).append("\t").append(seedNum).append("\t").append(infectedNodesMergedJson).append("\n");
 
@@ -381,18 +400,32 @@ public class Task1 {
             });
 
             // Add the current record to the output file, second phase of merge
-            Utils.print("writing graph " + name + ", phase 2");
+            print("writing graph " + name + ", phase 2");
             infectedNodesMergedJson = MyVertex.getGson().toJson(infectedNodesMerged2, type2);
             sb2.append(year).append("\t").append(seedNum).append("\t").append(infectedNodesMergedJson).append("\n");
 
-            Utils.print("infectedNodes avg len: " + infectedNodes.stream().mapToInt(Map::size).average().getAsDouble() + ", counter len: " + counter.size() + ", infectedNodesMerged len: " + infectedNodesMerged.size() + ", infectedNodesMerged2 len: " + infectedNodesMerged2.size());
+            print("infectedNodes avg len: " + infectedNodes.stream().mapToInt(Map::size).average().getAsDouble() + ", counter len: " + counter.size() + ", infectedNodesMerged len: " + infectedNodesMerged.size() + ", infectedNodesMerged2 len: " + infectedNodesMerged2.size());
         }
 
         // Write the merged independent cascade log
-        Utils.writeLog(sb1, "ic_results_merged1");
-        Utils.writeLog(sb2, "ic_results_merged2");
+        writeLog(sb1, "ic_results_merged1");
+        writeLog(sb2, "ic_results_merged2");
     }
 
+    /**
+     * Run the whole flow of spread of influence based on {@link IndependentCascade}: simulate all the iterations,
+     * put the iterations together, draw each iteration, repeat the process n times, then merge the resulting topics,
+     * and finally draw the result.
+     * @param n             The number of simulations to be performed and put together.
+     * @param k             The multiplication factor to be used in {@link DiffusionUtils#getEdgePropagationProbabilities}.
+     * @param ratio         The ratio to be used in {@link #mergeSpreadInfluenceResults}.
+     * @param threshold     The threshold to be used in {@link #mergeSpreadInfluenceResults}.
+     * @param doSimulations If true, execute the simulations, if false, previous results are used.
+     * @param name          The name to be used in logs and plots.
+     * @throws ImportException if raised by any of the invoked methods.
+     * @throws IOException if raised by any of the invoked methods.
+     * @throws URISyntaxException if raised by any of the invoked methods.
+     */
     public static void multipleIndependentCascadeFlow(int n, double k, double ratio, double threshold, boolean doSimulations, String name)
             throws ImportException, IOException, URISyntaxException {
         if (doSimulations) {
@@ -403,7 +436,7 @@ public class Task1 {
             }
         }
         mergeSpreadInfluenceResults(n, ratio, threshold);
-        DiffusionUtils.drawSpreadInfluence("ic_results_merged1.*\\.txt", name + "merge1");
-        DiffusionUtils.drawMerge("ic_results_merged2.*\\.txt", name + "merge2");
+        DiffusionUtils.drawSpreadInfluence("ic_results_merged1.*\\.txt", name + "merge1");   // phase 1
+        DiffusionUtils.drawMerge("ic_results_merged2.*\\.txt", name + "merge2");             // phase 2
     }
 }

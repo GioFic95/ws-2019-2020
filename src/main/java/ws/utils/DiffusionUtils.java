@@ -6,7 +6,6 @@ import com.univocity.parsers.common.IterableResult;
 import com.univocity.parsers.common.ParsingContext;
 import com.univocity.parsers.common.record.Record;
 import org.jgrapht.Graph;
-import org.jgrapht.io.ImportException;
 import ws.Main;
 import ws.myGraph.GraphUtils;
 import ws.task1.Task1;
@@ -22,8 +21,10 @@ import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ws.utils.Utils.*;
+
 /**
- *
+ * A class with utility functions for spread of influence problems.
  */
 public class DiffusionUtils {
 
@@ -35,15 +36,14 @@ public class DiffusionUtils {
      *         {u, v} and n_a is the number of times a used this pair of keywords,
      * - den_uv = sum_{for all {x, v} in E(G)}(sum_{a in A}(n_a)),
      * - den_vu = sum_{for all {x, u} in E(G)}(sum_{a in A}(n_a)).
-     * Finally the probabilities are normalized and multiplied by a constant factor 1.2
+     * Finally the probabilities are normalized and multiplied by a constant factor {@param k}.
      *
-     * @param graph todo
-     * @param year  todo
-     * @return todo
-     * @throws ImportException todo
-     * @throws IOException todo
-     * @throws URISyntaxException todo
-     * @see <a href="https://stackoverflow.com/questions/5969447/java-random-integer-with-non-uniform-distribution" target="_blank">Java: random integer with non-uniform distribution</a>
+     * @param graph The input graph from DS1.
+     * @param year  The year to which the graph is related.
+     * @param k     The multiplication factor to be applied to probabilities after normalization.
+     * @return The propagation probabilities of the graph.
+     * @throws IOException if raised by {@link Utils#writeLog}.
+     * @throws URISyntaxException if raised by {@link Utils#writeLog}.
      */
     public static Map<SimpleDirectedEdge, Double> getEdgePropagationProbabilities(Graph<MyVertex, MyEdgeDS1> graph, String year, double k)
             throws IOException, URISyntaxException {
@@ -62,26 +62,25 @@ public class DiffusionUtils {
             probabilities.put(new SimpleDirectedEdge(source, target), num/denSource);
             probabilities.put(new SimpleDirectedEdge(target, source), num/denTarget);
 
-//            Utils.print("num: " + num + ", denSource: " + denSource + ", denTarget: " + denTarget);
             sb.append("num: ").append(num).append(", denSource: ").append(denSource).append(", denTarget: ")
                     .append(denTarget).append(", ratioSource: ").append(num/denSource).append(", ratioTarget: ")
                     .append(num/denTarget).append("\n");
         }
 
-        // Normalize and multiply by a constant factor 1.5
+        // Normalize and multiply by a constant factor k
         double max = Collections.max(probabilities.values());
         probabilities = probabilities.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> Math.min(1, k*entry.getValue()/max)));
-        Utils.print("PropagationProbabilities: " + probabilities);
-        // Utils.writeLog(sb, "PropagationProbabilities_" + year);
+        print("PropagationProbabilities: " + probabilities);
+        writeLog(sb, "PropagationProbabilities_" + year);
         return probabilities;
     }
 
     /**
-     * todo
-     * @param s1
-     * @param s2
-     * @return
+     * A shortcut for joining two iteration of a diffusion model.
+     * @param s1 The infected nodes of iteration i-1.
+     * @param s2 The infected nodes of iteration i.
+     * @return The infected nodes up to iteration i.
      */
     public static Set<String> allInfected(Set<String> s1, Set<String> s2) {
         Set<String> s = new HashSet<>(s1);
@@ -90,12 +89,15 @@ public class DiffusionUtils {
     }
 
     /**
+     * Plot the results of a simulation of spread of influence: the nodes in the same topic have the same color,
+     * and the seeds are rectangular.
      * If {@param filename} is null or empty string, the last independent cascade unified log is used
-     * (as produced by {@link Task1#writeUnifiedSpreadInfluence(String)}).
-     * @param fileNamePattern todo
-     * @param dirName todo
-     * @throws URISyntaxException
-     * @throws IOException
+     * (as produced by {@link Task1#writeUnifiedSpreadInfluence}).
+     * @param fileNamePattern The log of a spread of influence simulation.
+     * @param dirName The directory in which the plot must be saved.
+     * @throws URISyntaxException if raised by {@link Utils#findLastLogs}, {@link Utils#getNewFile},
+     *              {@link GraphUtils#writeImage}, or if the plot directory can't be found and converted to URI.
+     * @throws IOException if raised by {@link GraphUtils#writeImage}.
      */
     public static void drawSpreadInfluence(String fileNamePattern, String dirName) throws URISyntaxException, IOException {
         // Prepare the output dir and file
@@ -104,16 +106,16 @@ public class DiffusionUtils {
         File dir = new File(Main.class.getResource("plots").toURI().getPath() + "\\" + pathName);
         if (! dir.isDirectory()) {
             if (!dir.mkdir()) {
-                Utils.print("the directory " + dirName + "does not exist and can't be created.");
+                print("the directory " + dirName + "does not exist and can't be created.");
             }
         }
         if (fileNamePattern == null || fileNamePattern.equals("")) {
-            fileName = Utils.findLastLog("ic_results__.*\\.txt");
+            fileName = findLastLog("ic_results__.*\\.txt");
         } else {
-            fileName = Utils.findLastLog(fileNamePattern);
+            fileName = findLastLog(fileNamePattern);
         }
 
-        IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "numSeeds", "infectedNodes"}, "logs/" + fileName);
+        IterableResult<Record, ParsingContext> ir = readTSV(new String[]{"year", "numSeeds", "infectedNodes"}, "logs/" + fileName);
         Type type = new TypeToken<Map<MyVertex, Set<MyVertex>>>(){}.getType();
         for (Record row : ir) {
             String year = row.getString("year");
@@ -123,7 +125,7 @@ public class DiffusionUtils {
             try {
                 infectedNodes = MyVertex.getGson().fromJson(infectedNodesJson, type);
             } catch (JsonSyntaxException ex) {
-                Utils.print("Can't parse string '" + infectedNodesJson + "' as json.");
+                print("Can't parse string '" + infectedNodesJson + "' as json.");
                 continue;
             }
             Map<String, Set<String>> infectedNodesIds = infectedNodes.entrySet().stream().collect(Collectors.toMap(
@@ -131,19 +133,21 @@ public class DiffusionUtils {
                     myVertexSetEntry -> myVertexSetEntry.getValue().stream().map(MyVertex::getId).collect(Collectors.toSet())
             ));
             String outName = year + "_" + numSeeds;
-            Utils.print("writing graph '" + outName + "' in dir 'plots/" + pathName + "'");
-            File file = Utils.getNewFile("graphs/ds1", year, "dot");
+            print("writing graph '" + outName + "' in dir 'plots/" + pathName + "'");
+            File file = getNewFile("graphs/ds1", year, "dot");
             GraphUtils.writeImage(file, "plots/" + pathName, outName, infectedNodesIds);
         }
     }
 
     /**
+     * Plot the results of the merging process: the nodes in the same topic have the same color, and the seeds are rectangular.
      * If {@param filename} is null or empty string, the last independent cascade merge log is used
-     * (as produced by {@link Task1#mergeSpreadInfluenceResults(int, double, double)}).
-     * @param fileNamePattern todo
-     * @param dirName todo
-     * @throws URISyntaxException
-     * @throws IOException
+     * (as produced by {@link Task1#mergeSpreadInfluenceResults}).
+     * @param fileNamePattern The log of a spread of influence simulation.
+     * @param dirName The directory in which the plot must be saved.
+     * @throws URISyntaxException if raised by {@link Utils#findLastLogs}, {@link Utils#getNewFile},
+     *              {@link GraphUtils#writeImage}, or if the plot directory can't be found and converted to URI.
+     * @throws IOException if raised by {@link GraphUtils#writeImage}.
      */
     public static void drawMerge(String fileNamePattern, String dirName) throws URISyntaxException, IOException {
         // Prepare the output dir and input file
@@ -152,17 +156,17 @@ public class DiffusionUtils {
         File dir = new File(Main.class.getResource("plots").toURI().getPath() + "\\" + pathName);
         if (! dir.isDirectory()) {
             if (!dir.mkdir()) {
-                Utils.print("the directory " + dirName + "does not exist and can't be created.");
+                print("the directory " + dirName + "does not exist and can't be created.");
             }
         }
         if (fileNamePattern == null || fileNamePattern.equals("")) {
-            fileName = Utils.findLastLog("ic_results_merged2__.*\\.txt");
+            fileName = findLastLog("ic_results_merged2__.*\\.txt");
         } else {
-            fileName = Utils.findLastLog(fileNamePattern);
+            fileName = findLastLog(fileNamePattern);
         }
-        Utils.print("file name: " + fileName);
+        print("file name: " + fileName);
 
-        IterableResult<Record, ParsingContext> ir = Utils.readTSV(new String[]{"year", "numSeeds", "infectedNodes"}, "logs/" + fileName);
+        IterableResult<Record, ParsingContext> ir = readTSV(new String[]{"year", "numSeeds", "infectedNodes"}, "logs/" + fileName);
         Type type = new TypeToken<Map<Set<MyVertex>, Set<MyVertex>>>(){}.getType();
         for (Record row : ir) {
             String year = row.getString("year");
@@ -172,17 +176,17 @@ public class DiffusionUtils {
             try {
                 infectedNodes = MyVertex.getGson().fromJson(infectedNodesJson, type);
             } catch (JsonSyntaxException ex) {
-                Utils.print("Can't parse string '" + infectedNodesJson + "' as json.");
+                print("Can't parse string '" + infectedNodesJson + "' as json.");
                 continue;
             }
             Map<Set<String>, Set<String>> infectedNodesIds = infectedNodes.entrySet().stream().collect(Collectors.toMap(
                     myVertexSetEntry -> myVertexSetEntry.getKey().stream().map(MyVertex::getId).collect(Collectors.toSet()),
                     myVertexSetEntry -> myVertexSetEntry.getValue().stream().map(MyVertex::getId).collect(Collectors.toSet())
             ));
-            Utils.print("infectedNodesIds" + infectedNodesIds);
+            print("infectedNodesIds" + infectedNodesIds);
             String outName = year + "_" + numSeeds;
-            Utils.print("writing graph '" + outName + "' in dir 'plots/" + pathName + "'");
-            File file = Utils.getNewFile("graphs/ds1", year, "dot");
+            print("writing graph '" + outName + "' in dir 'plots/" + pathName + "'");
+            File file = getNewFile("graphs/ds1", year, "dot");
             GraphUtils.writeImage(file, "plots/" + pathName, outName, infectedNodesIds);
         }
     }

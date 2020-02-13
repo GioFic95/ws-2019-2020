@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A class that represent a generic diffusion model.
+ */
 public abstract class DiffusionModel {
     protected Graph<MyVertex, MyEdgeDS1> graph;
     protected Map<MyVertex, NodeStatus> statuses;
@@ -17,6 +20,11 @@ public abstract class DiffusionModel {
 
     public enum NodeStatus {SUSCEPTIBLE, INFECTED, REMOVED}
 
+    /**
+     * Build the diffusion model.
+     * @param graph The graph on which the model has to be applied.
+     * @param seeds The set of nodes from which the diffusion begins.
+     */
     public DiffusionModel(Graph<MyVertex, MyEdgeDS1> graph, List<String> seeds) {
         this.graph = graph;
         this.seeds = seeds;
@@ -30,5 +38,9 @@ public abstract class DiffusionModel {
         }
     }
 
+    /**
+     * Simulate an iteration of the model.
+     * @return The set of nodes that became infected in this iteration.
+     */
     public abstract Set<String> iteration();
 }

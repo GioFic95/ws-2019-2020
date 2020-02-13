@@ -24,9 +24,20 @@ import java.util.*;
 import static ws.myGraph.GraphUtils.*;
 import static ws.task1.Task1.*;
 
+/**
+ * A class for testing portions of the project.
+ */
 public class Tests {
     private Tests() {} // ensure non-instantiability.
 
+    /**
+     * Just run the desired tests.
+     * @param args Not used
+     * @throws URISyntaxException if raised by any invoked method.
+     * @throws ExportException if raised by any invoked method.
+     * @throws IOException if raised by any invoked method.
+     * @throws ImportException if raised by any invoked method.
+     */
     public static void main(String[] args) throws URISyntaxException, ExportException, IOException, ImportException {
         // test dataset 1 stuff
 //        demoDS1();
@@ -52,7 +63,10 @@ public class Tests {
 //        singleIndependentCascadeFlow();
     }
 
-    public static void demoDS1() throws ExportException, IOException, ImportException, URISyntaxException {
+    /**
+     * Test basic operations on graphs of DS1.
+     */
+    private static void demoDS1() throws ExportException, IOException, ImportException, URISyntaxException {
         // create default graph
         Graph<MyVertex, MyEdgeDS1> graph = createMyGraphDS1Default();
         Utils.print("-- toString output");
@@ -75,8 +89,11 @@ public class Tests {
         Utils.print("two graphs are equal: " + graph.equals(graph1));
     }
 
-    @org.jetbrains.annotations.NotNull
-    public static Graph<MyVertex, MyEdgeDS1> createMyGraphDS1Default() {
+    /**
+     * Test creation of a graphs with the same structure of DS1.
+     * @return a DS1-like graph.
+     */
+    private static Graph<MyVertex, MyEdgeDS1> createMyGraphDS1Default() {
         Graph<MyVertex, MyEdgeDS1> graph = new SimpleGraph<>(MyEdgeDS1.class);
 
         MyVertex v1 = new MyVertex("v1");
@@ -119,7 +136,10 @@ public class Tests {
         return graph;
     }
 
-    public static void demoDS2() throws ExportException, IOException, ImportException, URISyntaxException {
+    /**
+     * Test basic operations on graphs of DS2.
+     */
+    private static void demoDS2() throws ExportException, IOException, ImportException, URISyntaxException {
         // create default graph
         Graph<MyVertex, DefaultWeightedEdge> graph = createMyGraphDS2Default();
         Utils.print("-- toString output");
@@ -145,8 +165,11 @@ public class Tests {
         writeImage(myFile1, "plots/ds2", "MyGraphDS2_2", Arrays.asList(s));
     }
 
-    @org.jetbrains.annotations.NotNull
-    public static Graph<MyVertex, DefaultWeightedEdge> createMyGraphDS2Default() {
+    /**
+     * Test creation of a graphs with the same structure of DS2.
+     * @return a DS2-like graph.
+     */
+    private static Graph<MyVertex, DefaultWeightedEdge> createMyGraphDS2Default() {
         Graph<MyVertex, DefaultWeightedEdge> graph = new SimpleWeightedGraph<>(DefaultWeightedEdge.class);
 
         MyVertex v1 = new MyVertex("v1");
@@ -174,6 +197,10 @@ public class Tests {
         return graph;
     }
 
+    /**
+     * Test probabilities on {@link SimpleDirectedEdge} edges (u,v): the probability of infection is different going
+     * from u to v or from v to u.
+     */
     private static void testDirectedEdgesProbabilities() throws ImportException, IOException, URISyntaxException {
         Graph<MyVertex, MyEdgeDS1> graph = GraphUtils.loadDS1Graph("2000");
         Map<SimpleDirectedEdge, Double> probabilities = DiffusionUtils.getEdgePropagationProbabilities(graph, "2000", 2);
@@ -185,6 +212,9 @@ public class Tests {
         Utils.print(probabilities.get(edge2));
     }
 
+    /**
+     * Test the correct serialization of different data structures containing nodes of type {@link MyVertex}.
+     */
     private static void testMyVertexSerialization() {
         Utils.print("test 0");
         Map<String, Set<String>> map4 = new HashMap<>();
@@ -283,6 +313,9 @@ public class Tests {
         });
     }
 
+    /**
+     * A serializer for maps {@link MyVertex} -> String.
+     */
     private static class MyMapOfMyVertexToStringSerializer implements JsonSerializer<Map<MyVertex, String>> {
         @Override
         public JsonElement serialize(Map<MyVertex, String> myVertexStringMap, Type type, JsonSerializationContext jsonSerializationContext) {
@@ -296,6 +329,9 @@ public class Tests {
         }
     }
 
+    /**
+     * A deserializer for maps set of {@link MyVertex} -> set of String.
+     */
     private static class MySetOfStringDeserializer implements JsonDeserializer<Map<Set<String>, Set<String>>> {
         @Override
         public Map<Set<String>, Set<String>> deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
@@ -318,10 +354,7 @@ public class Tests {
     }
 
     /**
-     * Execute a single Independent cascade simulation
-     * @throws ImportException
-     * @throws IOException
-     * @throws URISyntaxException
+     * Execute a single Independent cascade simulation.
      */
     public static void singleIndependentCascadeFlow() throws ImportException, IOException, URISyntaxException {
         // draw the plots for a specified independent cascade simulation log file
