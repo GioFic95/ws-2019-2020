@@ -19,6 +19,7 @@ public abstract class Weight<V, E extends DefaultEdge> {
     /**
      * Create a new weighting of the given graph.
      * @param graph The graph to be weighted.
+     * @param name  The name of this weight.
      */
     public Weight(Graph<V, E> graph, String name) {
         this.graph = graph;

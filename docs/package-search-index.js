@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"ws"},{"l":"ws.myGraph"},{"l":"ws.weights"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"ws"},{"l":"ws.myGraph"},{"l":"ws.task1"},{"l":"ws.task1.diffusionModels"},{"l":"ws.task2"},{"l":"ws.utils"},{"l":"ws.weights"}]

@@ -29,6 +29,7 @@ public class PageRankWeight extends Weight<MyVertex, MyEdgeDS1> {
      * Create a new weighting of the given graph, based on {@link PageRank}.
      * @param graph The graph to be weighted.
      * @param year  The year of the graph.
+     * @param name  The name of this weight.
      */
     public PageRankWeight(Graph<MyVertex, MyEdgeDS1> graph, String year, String name) {
         super(graph, name);

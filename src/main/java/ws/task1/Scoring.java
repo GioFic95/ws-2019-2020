@@ -36,6 +36,8 @@ public class Scoring {
     /**
      * Compute the list of the top k nodes, according to the specified scoring and weight.
      * @param graph   The input graph, on which to compute the desired scoring.
+     * @param name    The name to be used for the log file.
+     * @param year    The year of the given graph.
      * @param scoring The scoring measure to be used.
      * @param weight  The weight to be applied jointly with the scoring (effectively, this is another scoring measure).
      * @param a       The proportion in which the scoring is considered compared to the weight.
@@ -46,8 +48,8 @@ public class Scoring {
      * @throws URISyntaxException if raised by {@link Utils#writeLog}.
      */
     static List<String> computeScoring(
-            Graph<MyVertex, MyEdgeDS1> graph, String year, String name, ScoringMeasure scoring, Weight<MyVertex,
-            MyEdgeDS1> weight, double a, double b, int k)
+            Graph<MyVertex, MyEdgeDS1> graph, String year, String name, ScoringMeasure scoring,
+            Weight<MyVertex, MyEdgeDS1> weight, double a, double b, int k)
             throws IOException, URISyntaxException {
         StringBuilder sb = new StringBuilder(year);
         k = Integer.min(k, graph.vertexSet().size());
@@ -105,6 +107,8 @@ public class Scoring {
     /**
      * A shortcut for {@link #computeScoring(Graph, String, String, ScoringMeasure, Weight, double, double, int)} with weight=null, a=0, b=0.
      * @param graph   The input graph, on which to compute the desired scoring.
+     * @param name    The name to be used for the log file.
+     * @param year    The year of the given graph.
      * @param scoring The scoring measure to be used.
      * @param k       How many nodes to pick as the "top ones".
      * @return        The list of the ids of the top k nodes, according to the specified scoring and weight.
@@ -119,7 +123,10 @@ public class Scoring {
     /**
      * A shortcut for {@link #computeScoring(Graph, String, String, ScoringMeasure, Weight, double, double, int)} with weight=null, a=0, b=0.
      * @param graph   The input graph, on which to compute the desired scoring.
+     * @param name    The name to be used for the log file.
+     * @param year    The year of the given graph.
      * @param scoring The scoring measure to be used.
+     * @param weight  The weight to be applied jointly with the scoring.
      * @param k       How many nodes to pick as the "top ones".
      * @return        The list of the ids of the top k nodes, according to the specified scoring and weight.
      * @throws IOException if raised by {@link #computeScoring(Graph, String, String, ScoringMeasure, Weight, double, double, int)}.

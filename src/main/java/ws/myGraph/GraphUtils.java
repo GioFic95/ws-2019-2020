@@ -278,6 +278,7 @@ public class GraphUtils {
     /**
      * Produces a map id -> value for the nodes of the graph of the given year in DS1.
      * @param year The year of the graph whose map is to be computed.
+     * @return A map id -> value for the nodes of the graph of the given year in DS1.
      * @throws ImportException if raised by {@link #loadDS1Graph(String)}
      * @throws IOException if raised by {@link #loadDS1Graph(String)}
      * @throws URISyntaxException if raised by {@link #loadDS1Graph(String)}

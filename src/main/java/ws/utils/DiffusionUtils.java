@@ -36,7 +36,7 @@ public class DiffusionUtils {
      *         {u, v} and n_a is the number of times a used this pair of keywords,
      * - den_uv = sum_{for all {x, v} in E(G)}(sum_{a in A}(n_a)),
      * - den_vu = sum_{for all {x, u} in E(G)}(sum_{a in A}(n_a)).
-     * Finally the probabilities are normalized and multiplied by a constant factor {@param k}.
+     * Finally the probabilities are normalized and multiplied by a constant factor k.
      *
      * @param graph The input graph from DS1.
      * @param year  The year to which the graph is related.
@@ -91,7 +91,7 @@ public class DiffusionUtils {
     /**
      * Plot the results of a simulation of spread of influence: the nodes in the same topic have the same color,
      * and the seeds are rectangular.
-     * If {@param filename} is null or empty string, the last independent cascade unified log is used
+     * If filename is null or empty string, the last independent cascade unified log is used
      * (as produced by {@link Task1#writeUnifiedSpreadInfluence}).
      * @param fileNamePattern The log of a spread of influence simulation.
      * @param dirName The directory in which the plot must be saved.
@@ -141,7 +141,7 @@ public class DiffusionUtils {
 
     /**
      * Plot the results of the merging process: the nodes in the same topic have the same color, and the seeds are rectangular.
-     * If {@param filename} is null or empty string, the last independent cascade merge log is used
+     * If filename is null or empty string, the last independent cascade merge log is used
      * (as produced by {@link Task1#mergeSpreadInfluenceResults}).
      * @param fileNamePattern The log of a spread of influence simulation.
      * @param dirName The directory in which the plot must be saved.

@@ -64,7 +64,7 @@ public class Main {
 
     /**
      * Execute all the steps of the preprocessing phase by calling {@link #preprocessing}, then all the steps of the
-     * first task by calling {@link Task1#tryMeasures} and {@link Task1#multipleIndependentCascadeFlow)},
+     * first task by calling {@link Task1#tryMeasures} and {@link Task1#multipleIndependentCascadeFlow},
      * and the steps in the second task by calling {@link Task2#traceTopics}.
      * Finally, read the last outputs of the various steps and writes more human-readable logs,
      * by calling{@link #humanReadableOutput}.

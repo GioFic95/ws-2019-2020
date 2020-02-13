@@ -23,6 +23,8 @@ public class SimpleWeight extends Weight<MyVertex, MyEdgeDS1> {
     /**
      * Create a new weighting of the given graph, based on the number of occurrences of the keywords in the articles.
      * @param graph The graph to be weighted.
+     * @param name  The name of this weight.
+     * @param year  The year of the graph.
      */
     public SimpleWeight(Graph<MyVertex, MyEdgeDS1> graph, String year, String name) {
         super(graph, name);
@@ -32,6 +34,7 @@ public class SimpleWeight extends Weight<MyVertex, MyEdgeDS1> {
     /**
      * Computes the weighting of the graph, by assigning to each node the normalized sum of the occurrences
      * of the keyword contained in the node into the articles that appears on the edges incident on that node.
+     * @param normalize Establish if the values must be normalized.
      * @return A weighting of the graph based on the number of occurrences of the keywords in the articles.
      * @see MyEdgeDS1#getAuthors() MyEdgeDS1.getAuthors
      * @see MyVertex#getValue() MyVertex.getValue

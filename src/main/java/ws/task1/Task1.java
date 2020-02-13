@@ -274,7 +274,7 @@ public class Task1 {
     }
 
     /**
-     * Merge the last {@param n} independent cascade results.
+     * Merge the last n independent cascade results.
      * @param n         The number of independent cascade simulations to be merged.
      * @param ratio     A node is added to a topic if it is infected at least in n/ratio times in the simulations.
      * @param threshold Two topics are merged if their overlap coefficient is greater than threshold.
