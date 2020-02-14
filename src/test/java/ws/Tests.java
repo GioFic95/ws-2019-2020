@@ -14,6 +14,7 @@ import ws.myGraph.MyVertex;
 import ws.myGraph.SimpleDirectedEdge;
 import ws.utils.DiffusionUtils;
 import ws.utils.Utils;
+import ws.weights.PageRankWeight;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,27 +41,27 @@ public class Tests {
      */
     public static void main(String[] args) throws URISyntaxException, ExportException, IOException, ImportException {
         // test dataset 1 stuff
-//        demoDS1();
+        demoDS1();
 
         // test dataset 2 stuff
-//        demoDS2();
+        demoDS2();
 
         // test PageRankWeight
-//        Graph<MyVertex, MyEdgeDS1> g = GraphUtils.loadDS1Graph("2018");
-//        PageRankWeight prw = new PageRankWeight(g, "2018", "test");
-//        Utils.print(prw.getScores());
+        Graph<MyVertex, MyEdgeDS1> g = GraphUtils.loadDS1Graph("2018");
+        PageRankWeight prw = new PageRankWeight(g, "2018", "test");
+        Utils.print(prw.getScores());
 
         // test delete files according to pattern
-//        Utils.delMatchigFiles("test", "(scoring|simple_weight|page_rank)[a-zA-Z_]*\\.txt");
+        Utils.delMatchigFiles("test", "(scoring|simple_weight|page_rank)[a-zA-Z_]*\\.txt");
 
         // test for computing probabilities on directed edges in undirected graphs
-//        testDirectedEdgesProbabilities();
+        testDirectedEdgesProbabilities();
 
         // test the functioning of the serialization and deserialization of maps containing MyVertex objects
         testMyVertexSerialization();
 
         // test a single flow of independent cascade simulation
-//        singleIndependentCascadeFlow();
+        singleIndependentCascadeFlow();
     }
 
     /**

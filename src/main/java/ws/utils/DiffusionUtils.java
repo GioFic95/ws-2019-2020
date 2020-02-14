@@ -31,7 +31,7 @@ public class DiffusionUtils {
     /**
      * For each edge {u, v} of the undirected graph taken from DS1, compute a pair of probabilities pr_uv and pr_vu,
      * respectively for the directed edges (u, v) and (v, u), where:
-     * - pr_uv = num/den_uv e pv_vu = num/den_vu,
+     * - pr_uv = num/den_uv and pv_vu = num/den_vu,
      * - num = sum_{a in A}(n_a), where A is the list of authors that use the pair of keywords represented by the edge,
      *         {u, v} and n_a is the number of times a used this pair of keywords,
      * - den_uv = sum_{for all {x, v} in E(G)}(sum_{a in A}(n_a)),

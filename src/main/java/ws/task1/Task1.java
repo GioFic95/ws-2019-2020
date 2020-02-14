@@ -276,7 +276,7 @@ public class Task1 {
     /**
      * Merge the last n independent cascade results.
      * @param n         The number of independent cascade simulations to be merged.
-     * @param ratio     A node is added to a topic if it is infected at least in n/ratio times in the simulations.
+     * @param ratio     A node is added to a topic if it is infected at least in n*ratio times in the simulations.
      * @param threshold Two topics are merged if their overlap coefficient is greater than threshold.
      * @throws URISyntaxException if raised by {@link Utils#writeLog}, {@link Utils#findLastLog}.
      * @throws IOException if raised by {@link Utils#writeLog}.
@@ -312,7 +312,7 @@ public class Task1 {
             List<Map<MyVertex, Set<MyVertex>>> infectedNodes = new ArrayList<>();
             currentRows.forEach(row -> infectedNodes.add(MyVertex.getGson().fromJson(row.getString("infectedNodes"), type1)));
 
-            // *** PHASE 1: add to a topic each keyword that is infected at least in 1/ratio of the simulations ***
+            // *** PHASE 1: add to a topic each keyword that is infected at least in n/ratio times ***
             Map<MyVertex, Map<MyVertex, Integer>> counter = new HashMap<>();
             infectedNodes.forEach(
                     myVertexSetMap -> myVertexSetMap.forEach(

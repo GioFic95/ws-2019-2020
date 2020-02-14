@@ -33,7 +33,7 @@ public class SimpleWeight extends Weight<MyVertex, MyEdgeDS1> {
 
     /**
      * Computes the weighting of the graph, by assigning to each node the normalized sum of the occurrences
-     * of the keyword contained in the node into the articles that appears on the edges incident on that node.
+     * of the keyword contained in the node into the articles that appear on the edges incident on that node.
      * @param normalize Establish if the values must be normalized.
      * @return A weighting of the graph based on the number of occurrences of the keywords in the articles.
      * @see MyEdgeDS1#getAuthors() MyEdgeDS1.getAuthors
